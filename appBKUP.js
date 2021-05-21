@@ -1,0 +1,28 @@
+import { StatusBar } from 'expo-status-bar';
+import React from 'react';
+import { StyleSheet, Text, View, FlatList, Dimensions } from 'react-native';
+
+export default function App() {
+
+  const data = [
+    { key: 'Play' }, { key: '' }, { key: '' }, { key: '' }, { key: '' },
+    { key: 'Score' }, { key: '0' },
+  ];
+  const numColumns = 7;
+
+  return (
+    <View style={styles.container}>
+      <Text>Open up App.js to start working on your app!</Text>
+      <StatusBar style="auto" />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
