@@ -1,9 +1,20 @@
-import React from 'react';
-import { StyleSheet, Text, View, FlatList, Dimensions, TouchableOpacity } from 'react-native';
+import React, {useState, useCallback} from 'react';
+import 
+  { StyleSheet, Text, View, FlatList, Dimensions, TouchableOpacity } from 'react-native';
 import { newBoard } from './newboard.js';
 
 export default function App() {
+  const [{ roll, position, message, optMessage, score, board }, setGameState] = useState({
+    roll: 0,
+    position: -1,
+    message: 'Roll again',
+    optMessage: 'Kim',
+    score: 0,
+    board: newBoard.slice(),
+  });
+  console.log(board);
 
+// Nav bar
   const nav = [
     { key: 1, name: 'Play', invisible: false }, 
     { key: 2, name: '', invisible: true }, 
@@ -16,6 +27,7 @@ export default function App() {
 
   const numColumns = 7;
 
+// render Nav Bar
   const renderNav = ({ item }) => {
     if (item.invisible === true) {
       return <View style={[styles.item, styles.itemInvisible]} />;
@@ -23,7 +35,7 @@ export default function App() {
     if (item.name === 'Play') {
       return (
         <View style={styles.item}>
-        <TouchableOpacity onPress={() => pressPlay(item.key)}> 
+        <TouchableOpacity onPress={() => pressPlay( )}> 
                 <Text style={styles.itemText}>{item.name}</Text>
                 </TouchableOpacity>
         </View>
@@ -36,6 +48,7 @@ export default function App() {
     );
   };
 
+  // render board
   const renderBoard = ({ item }) => {
     if (item.invisible === true) {
       return <View style={[styles.item, styles.itemInvisible]} />;
@@ -56,14 +69,28 @@ export default function App() {
     );
   };
 
-  const pressPlay = (key) => {
-    console.log('Play', key);
-  };
+// press Play button
+  const pressPlay = useCallback( () => {
+    console.log('Play button');
+    setGameState( () => {
+      return {
+        roll: null,
+        position: -1,
+        message: 'Roll again',
+        optMessage: 'Kim',
+        score: 0,
+        board: newBoard.slice(),
+    };
+  });
+  }, []);
 
+// press Roll button
   const pressRoll = (key) => {
-    console.log('Roll', key);
+    const randomNumber = Math.floor(Math.random() * 6) + 1;
+    console.log('Roll Dice = ', randomNumber);
   };
 
+// render
   return (
     <View style={styles.container}>
         <View style={styles.nav}>
@@ -74,8 +101,8 @@ export default function App() {
               numColumns={numColumns}
             />
             <View style={styles.message}>
-                <Text style={styles.message}>Roll Again</Text>
-                  <Text style={styles.message}>Kim</Text>
+                <Text style={styles.message}>{message}</Text>
+                  <Text style={styles.message}>{optMessage}</Text>
             </View>
         </View>
         <View style={styles.board}>
@@ -90,6 +117,7 @@ export default function App() {
   );
 }
 
+// stylesheets
 const styles = StyleSheet.create({
   container: {
     flex: 1,
