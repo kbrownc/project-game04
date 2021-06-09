@@ -1,68 +1,66 @@
-import React from 'react';
-import { StyleSheet, Text, View, FlatList, Dimensions } from 'react-native';
+// roll dice (roll button)
+  const pressRoll = useCallback(() => {
+    setGameState(prevGameState => {
+      let workBoard = prevGameState.board.slice();
+      const randomNumber = Math.floor(Math.random() * 6) + 1;
+      const newPosition = Math.min(prevGameState.position + randomNumber, workBoard.length - 1);
+      let scoreAdj = 1;
+      let workMessage = 'Roll again';
+      let workOptMessage = 'Kim';
+      // Need to adjust score if 'miss a turn' or 'gain a turn' was landed on
+      if (workBoard[newPosition].extraScore !== undefined) {
+        scoreAdj = scoreAdj + workBoard[newPosition].extraScore;
+        if (workBoard[newPosition].extraScore < 0) {
+          workOptMessage = 'Wonderful....you get an extra roll';
+        } else {
+          workOptMessage = 'Sorry....you lose a roll';
+        }
+      }
+      // Add the detour squares and remove a single square after detour
+      if (workBoard[newPosition].itemsToAdd !== undefined) {
+        let workBoard2 = workBoard.slice()
+        let i;
+        for (i=0; i < workboard2.length; i++) {
+          if (workBoard2[i].itemsToAdd !== undefined) {
+            if (workBoard2[newPosition].itemsToAdd === workBoard2[i].addItem) {
+              workBoard2[i].invisible = false;
+              workBoard2[i].boardNumber = workBoard2[i].boardNumber + newPosition;
+            }
+          }
+          if (workBoard2[i].deleteItem !== undefined) {
+            if (workBoard2[newPosition].itemsToAdd === workBoard2[i].deleteItem) {
+              workBoard2[i].invisible = true;
+            }
+          }
+          if (workBoard2[i].boardNumber !== undefined) {
+            if (workBoard2[i].boardNumber > newPosition && workBoard2[i].invisible === false) {
+              workBoard2[i].boardNumber = workBoard2[i].boardNumber + 7;
+            }
+          }
+        }
+        workBoard = workBoard2.slice();
+        workOptMessage = 'You have a longer journey';
+      }
+      // Check for end of Game
+      // First check what is current length of board
+      let filteredBoard = workBoard.filter(function (currentElement) {
+        return currentElement.boardNumber !== undefined && currentElement.invisible === false;
+      });
+      if (newPosition >= filteredBoard.length - 1) {
+        workMessage = 'Game Complete';
+        workOptMessage = 'Kim';
+      } else {
+        workMessage = 'Role Again';
+      }
+      return {
+        roll: randomNumber,
+        position: newPosition,
+        message: workMessage,
+        optMessage: workOptMessage,
+        score: prevGameState.score + scoreAdj,
+        board: workBoard,
+      };
+    });
+  }, []);
 
-const data = [
-  { key: 'Play' }, { key: '' }, { key: '' }, { key: '' }, { key: '' },
-   { key: 'Score' }, { key: '0' },
-];
-
-const formatData = (data, numColumns) => {
-  const numberOfFullRows = Math.floor(data.length / numColumns);
-
-  let numberOfElementsLastRow = data.length - (numberOfFullRows * numColumns);
-  while (numberOfElementsLastRow !== numColumns && numberOfElementsLastRow !== 0) {
-    data.push({ key: `blank-${numberOfElementsLastRow}`, empty: true });
-    numberOfElementsLastRow++;
-  }
-
-  return data;
-};
-
-const numColumns = 7;
-
-export default class App extends React.Component {
-  renderItem = ({ item, index }) => {
-    if (item.empty === true) {
-      return <View style={[styles.item, styles.itemInvisible]} />;
-    }
-    return (
-      <View
-        style={styles.item}
-      >
-        <Text style={styles.itemText}>{item.key}</Text>
-      </View>
-    );
-  };
-
-  render() {
-    return (
-      <FlatList
-        data={formatData(data, numColumns)}
-        style={styles.container}
-        renderItem={this.renderItem}
-        numColumns={numColumns}
-      />
-    );
-  }
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginVertical: 20,
-  },
-  item: {
-    backgroundColor: '#4D243D',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    margin: 1,
-    height: Dimensions.get('window').width / numColumns, // approximate a square
-  },
-  itemInvisible: {
-    backgroundColor: 'transparent',
-  },
-  itemText: {
-    color: '#fff',
-  },
-});
+  let isGameComplete = position <= board.length - 2;

@@ -12,7 +12,6 @@ export default function App() {
     score: 0,
     board: newBoard.slice(),
   });
-  console.log(board);
 
 // Nav bar
   const nav = [
@@ -22,7 +21,7 @@ export default function App() {
     { key: 4, name: '', invisible: true },
     { key: 5, name: '', invisible: true }, 
     { key: 6, name: 'Score' }, 
-    { key: 7, name: '0' },
+    { key: 7, name: 0 },
   ];
 
   const numColumns = 7;
@@ -38,6 +37,13 @@ export default function App() {
         <TouchableOpacity onPress={() => pressPlay( )}> 
                 <Text style={styles.itemText}>{item.name}</Text>
                 </TouchableOpacity>
+        </View>
+        )
+    }
+    if (item.key === 7) {
+      return (
+        <View style={styles.item}>
+                <Text style={styles.itemText}>{score}</Text>
         </View>
         )
     }
@@ -62,6 +68,21 @@ export default function App() {
         </View>
         )
     }
+    if (item.key === 11) {
+      return (
+        <View style={styles.item}>
+                <Text style={styles.itemText}>{roll}</Text>
+        </View>
+        )
+    }
+    // mark current spot on board 
+    if (position === item.boardNumber && item.invisible === undefined) {
+      return (
+        <View style={[styles.item, styles.markSpot]}>
+                <Text style={styles.itemText}></Text>
+        </View>
+        )
+    }
     return (
       <View style={styles.item}>
         <Text style={styles.itemText}>{item.name}</Text>
@@ -71,7 +92,6 @@ export default function App() {
 
 // press Play button
   const pressPlay = useCallback( () => {
-    console.log('Play button');
     setGameState( () => {
       return {
         roll: null,
@@ -87,6 +107,7 @@ export default function App() {
 // press Roll button
   const pressRoll = (key) => {
     const randomNumber = Math.floor(Math.random() * 6) + 1;
+    const newPosition = randomNumber;
     console.log('Roll Dice = ', randomNumber);
   };
 
@@ -112,7 +133,7 @@ export default function App() {
               style={styles.board}
               numColumns={numColumns}
             />
-        </View>
+        </View> 
     </View>
   );
 }
@@ -156,5 +177,8 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: 'bold',
     marginVertical: 5,
+  },
+  markSpot: {
+  backgroundColor: 'red',
   }
 });
