@@ -6,7 +6,7 @@ import { newBoard } from './newboard.js';
 export default function App() {
   const [{ roll, position, message, optMessage, score, board }, setGameState] = useState({
     roll: 0,
-    position: -1,
+    position: 0,
     message: 'Roll again',
     optMessage: 'Kim',
     score: 0,
@@ -59,6 +59,7 @@ export default function App() {
     if (item.invisible === true) {
       return <View style={[styles.item, styles.itemInvisible]} />;
     }
+    // Sho ROLL button
     if (item.name === 'Roll') {
       return (
         <View style={styles.item}>
@@ -68,6 +69,7 @@ export default function App() {
         </View>
         )
     }
+    // Show ROLL NUMBER
     if (item.key === 11) {
       return (
         <View style={styles.item}>
@@ -95,7 +97,7 @@ export default function App() {
     setGameState( () => {
       return {
         roll: null,
-        position: -1,
+        position: 0,
         message: 'Roll again',
         optMessage: 'Kim',
         score: 0,
@@ -105,11 +107,81 @@ export default function App() {
   }, []);
 
 // press Roll button
-  const pressRoll = (key) => {
-    const randomNumber = Math.floor(Math.random() * 6) + 1;
-    const newPosition = randomNumber;
-    console.log('Roll Dice = ', randomNumber);
-  };
+  const pressRoll = useCallback(() => {
+    setGameState(prevGameState => {
+      let workBoard = prevGameState.board.slice();
+  //    const randomNumber = Math.floor(Math.random() * 6) + 1;
+      const randomNumber = 1;
+ // calculate location in array that matches current boardNumber     
+      let filteredBoard = workBoard.filter(function(currentElement) {
+        return (currentElement.boardNumber !== undefined && currentElement.invisible !== true);
+      });
+      const newPosition = Math.min(prevGameState.position + randomNumber, filteredBoard.length - 1);
+      let i;
+      let newPositionBoard;
+      for (i=0; i < filteredBoard.length; i++) {
+        if (filteredBoard[i].boardNumber === newPosition) {
+          newPositionBoard = filteredBoard[i].key - 1;
+        }
+      }
+      console.log('newPosition',newPosition,'newPositionBoard',newPositionBoard);
+      let scoreAdj = 1;
+      let workMessage = 'Roll again';
+      let workOptMessage = 'Kim';
+      // Need to adjust score if 'miss a turn' or 'gain a turn' was landed on
+      if (workBoard[newPositionBoard].extraScore !== undefined) {
+        scoreAdj = scoreAdj + workBoard[newPositionBoard].extraScore;
+        if (workBoard[newPositionBoard].extraScore < 0) {
+          workOptMessage = 'Wonderful....you get an extra roll';
+        } else {
+          workOptMessage = 'Sorry....you lose a roll';
+        }
+      }
+      // Add the detour squares and remove a single square after detour
+      if (workBoard[newPositionBoard].itemsToAdd !== undefined) {
+        let workBoard2 = workBoard.slice()
+        let i;
+        for (i=0; i < workBoard2.length; i++) {
+          if (workBoard2[i].itemsToAdd !== undefined) {
+            if (workBoard2[newPositionBoard].itemsToAdd === workBoard2[i].addItem) {
+              workBoard2[i].invisible = false;
+              workBoard2[i].boardNumber = workBoard2[i].boardNumber + newPosition;
+            }
+          }
+          if (workBoard2[i].deleteItem !== undefined) {
+            if (workBoard2[newPositionBoard].deleteItem === workBoard2[i].deleteItem) {
+              workBoard2[i].invisible = true;
+            }
+          }
+          if (workBoard2[i].boardNumber !== undefined) {
+            if (workBoard2[i].boardNumber > newPosition && workBoard2[i].invisible === false &&
+                workBoard2[i].itemsToAdd === undefined) {
+              workBoard2[i].boardNumber = workBoard2[i].boardNumber + 7;
+            }
+          }
+        }
+        workBoard = workBoard2.slice();
+        workOptMessage = 'You have a longer journey';
+      }
+      // Check for end of Game
+      if (newPosition >= filteredBoard.length - 1) {
+        workMessage = 'Game Complete';
+        workOptMessage = 'Kim';
+        workBoard[3].invisible = true;
+        workBoard[10].invisible = true;
+      } else {
+        workMessage = 'Role Again';
+      }
+      return {
+        roll: randomNumber,
+        position: newPosition,
+        message: workMessage,
+        optMessage: workOptMessage,
+        score: prevGameState.score + scoreAdj,
+        board: workBoard,
+      };
+    });
+  }, []);
 
 // render
   return (
@@ -128,7 +200,7 @@ export default function App() {
         </View>
         <View style={styles.board}>
             <FlatList
-              data={newBoard}
+              data={board}
               renderItem={renderBoard}
               style={styles.board}
               numColumns={numColumns}
