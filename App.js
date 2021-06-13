@@ -10,7 +10,7 @@ export default function App() {
     message: 'Roll again',
     optMessage: 'Kim',
     score: 0,
-    board: newBoard.slice(),
+    board: JSON.parse(JSON.stringify(newBoard)),
   });
 
 // Nav bar
@@ -78,7 +78,8 @@ export default function App() {
         )
     }
     // mark current spot on board 
-    if (position === item.boardNumber && item.invisible === undefined) {
+    if (position === item.boardNumber && 
+          (item.invisible === undefined || item.invisible === false)) {
       return (
         <View style={[styles.item, styles.markSpot]}>
                 <Text style={styles.itemText}></Text>
@@ -101,7 +102,7 @@ export default function App() {
         message: 'Roll again',
         optMessage: 'Kim',
         score: 0,
-        board: newBoard.slice(),
+        board: JSON.parse(JSON.stringify(newBoard)),
     };
   });
   }, []);
@@ -116,7 +117,7 @@ export default function App() {
       let filteredBoard = workBoard.filter(function(currentElement) {
         return (currentElement.boardNumber !== undefined && currentElement.invisible !== true);
       });
-      const newPosition = Math.min(prevGameState.position + randomNumber, filteredBoard.length - 1);
+      const newPosition = Math.min(prevGameState.position + randomNumber, filteredBoard.length);
       let i;
       let newPositionBoard;
       for (i=0; i < filteredBoard.length; i++) {
@@ -124,7 +125,6 @@ export default function App() {
           newPositionBoard = filteredBoard[i].key - 1;
         }
       }
-      console.log('newPosition',newPosition,'newPositionBoard',newPositionBoard);
       let scoreAdj = 1;
       let workMessage = 'Roll again';
       let workOptMessage = 'Kim';
@@ -142,21 +142,21 @@ export default function App() {
         let workBoard2 = workBoard.slice()
         let i;
         for (i=0; i < workBoard2.length; i++) {
-          if (workBoard2[i].itemsToAdd !== undefined) {
+          if (workBoard2[i].addItem !== undefined) {
             if (workBoard2[newPositionBoard].itemsToAdd === workBoard2[i].addItem) {
               workBoard2[i].invisible = false;
-              workBoard2[i].boardNumber = workBoard2[i].boardNumber + newPosition;
+              workBoard2[i].boardNumber = workBoard2[i].boardNumber + newPosition;          
             }
           }
           if (workBoard2[i].deleteItem !== undefined) {
-            if (workBoard2[newPositionBoard].deleteItem === workBoard2[i].deleteItem) {
+            if (workBoard2[newPositionBoard].itemsToAdd === workBoard2[i].deleteItem) {
               workBoard2[i].invisible = true;
             }
           }
           if (workBoard2[i].boardNumber !== undefined) {
-            if (workBoard2[i].boardNumber > newPosition && workBoard2[i].invisible === false &&
-                workBoard2[i].itemsToAdd === undefined) {
-              workBoard2[i].boardNumber = workBoard2[i].boardNumber + 7;
+            if (workBoard2[i].boardNumber > newPosition && workBoard2[i].invisible === undefined &&
+                workBoard2[i].addItem === undefined) {
+              workBoard2[i].boardNumber = workBoard2[i].boardNumber + 6;
             }
           }
         }
@@ -164,7 +164,9 @@ export default function App() {
         workOptMessage = 'You have a longer journey';
       }
       // Check for end of Game
-      if (newPosition >= filteredBoard.length - 1) {
+      console.log('EOG pre-check','newPosition',newPosition, 'filteredBoard.length',filteredBoard.length)
+      if (newPosition >= filteredBoard.length) {
+        console.log('EOG check',newPosition, filteredBoard.length)
         workMessage = 'Game Complete';
         workOptMessage = 'Kim';
         workBoard[3].invisible = true;
