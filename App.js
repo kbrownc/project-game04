@@ -111,8 +111,7 @@ export default function App() {
   const pressRoll = useCallback(() => {
     setGameState(prevGameState => {
       let workBoard = prevGameState.board.slice();
-  //    const randomNumber = Math.floor(Math.random() * 6) + 1;
-      const randomNumber = 1;
+      const randomNumber = Math.floor(Math.random() * 6) + 1;
  // calculate location in array that matches current boardNumber     
       let filteredBoard = workBoard.filter(function(currentElement) {
         return (currentElement.boardNumber !== undefined && currentElement.invisible !== true);
@@ -164,9 +163,7 @@ export default function App() {
         workOptMessage = 'You have a longer journey';
       }
       // Check for end of Game
-      console.log('EOG pre-check','newPosition',newPosition, 'filteredBoard.length',filteredBoard.length)
       if (newPosition >= filteredBoard.length) {
-        console.log('EOG check',newPosition, filteredBoard.length)
         workMessage = 'Game Complete';
         workOptMessage = 'Kim';
         workBoard[3].invisible = true;
