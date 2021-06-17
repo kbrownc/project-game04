@@ -1,6 +1,5 @@
-import React, {useState, useCallback} from 'react';
-import 
-  { StyleSheet, Text, View, FlatList, Dimensions, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { StyleSheet, Text, View, FlatList, Dimensions, TouchableOpacity} from 'react-native';
 import { newBoard } from './newboard.js';
 
 export default function App() {
@@ -13,20 +12,20 @@ export default function App() {
     board: JSON.parse(JSON.stringify(newBoard)),
   });
 
-// Nav bar
+  // Nav bar
   const nav = [
-    { key: 1, name: 'Play', invisible: false }, 
-    { key: 2, name: '', invisible: true }, 
-    { key: 3, name: '', invisible: true }, 
+    { key: 1, name: 'Play', invisible: false },
+    { key: 2, name: '', invisible: true },
+    { key: 3, name: '', invisible: true },
     { key: 4, name: '', invisible: true },
-    { key: 5, name: '', invisible: true }, 
-    { key: 6, name: 'Score' }, 
+    { key: 5, name: '', invisible: true },
+    { key: 6, name: 'Score' },
     { key: 7, name: 0 },
   ];
 
   const numColumns = 7;
 
-// render Nav Bar
+  // render Nav Bar
   const renderNav = ({ item }) => {
     if (item.invisible === true) {
       return <View style={[styles.item, styles.itemInvisible]} />;
@@ -34,22 +33,22 @@ export default function App() {
     if (item.name === 'Play') {
       return (
         <View style={styles.item}>
-        <TouchableOpacity onPress={() => pressPlay( )}> 
-                <Text style={styles.itemText}>{item.name}</Text>
-                </TouchableOpacity>
+          <TouchableOpacity onPress={() => pressPlay()}>
+            <Text style={styles.itemText}>{item.name}</Text>
+          </TouchableOpacity>
         </View>
-        )
+      );
     }
     if (item.key === 7) {
       return (
         <View style={styles.item}>
-                <Text style={styles.itemText}>{score}</Text>
+          <Text style={styles.itemText}>{score}</Text>
         </View>
-        )
+      );
     }
     return (
       <View style={styles.item}>
-          <Text style={styles.itemText}>{item.name}</Text>
+        <Text style={styles.itemText}>{item.name}</Text>
       </View>
     );
   };
@@ -63,28 +62,27 @@ export default function App() {
     if (item.name === 'Roll') {
       return (
         <View style={styles.item}>
-        <TouchableOpacity onPress={() => pressRoll(item.key)}> 
-                <Text style={styles.itemText}>{item.name}</Text>
-                </TouchableOpacity>
+          <TouchableOpacity onPress={() => pressRoll(item.key)}>
+            <Text style={styles.itemText}>{item.name}</Text>
+          </TouchableOpacity>
         </View>
-        )
+      );
     }
     // Show ROLL NUMBER
     if (item.key === 11) {
       return (
         <View style={styles.item}>
-                <Text style={styles.itemText}>{roll}</Text>
+          <Text style={styles.itemText}>{roll}</Text>
         </View>
-        )
+      );
     }
-    // mark current spot on board 
-    if (position === item.boardNumber && 
-          (item.invisible === undefined || item.invisible === false)) {
+    // mark current spot on board
+    if (position === item.boardNumber && (item.invisible === undefined || item.invisible === false)) {
       return (
         <View style={[styles.item, styles.markSpot]}>
-                <Text style={styles.itemText}></Text>
+          <Text style={styles.itemText}></Text>
         </View>
-        )
+      );
     }
     return (
       <View style={styles.item}>
@@ -93,9 +91,9 @@ export default function App() {
     );
   };
 
-// press Play button
-  const pressPlay = useCallback( () => {
-    setGameState( () => {
+  // press Play button
+  const pressPlay = useCallback(() => {
+    setGameState(() => {
       return {
         roll: null,
         position: 0,
@@ -103,23 +101,23 @@ export default function App() {
         optMessage: 'Kim',
         score: 0,
         board: JSON.parse(JSON.stringify(newBoard)),
-    };
-  });
+      };
+    });
   }, []);
 
-// press Roll button
+  // press Roll button
   const pressRoll = useCallback(() => {
     setGameState(prevGameState => {
       let workBoard = prevGameState.board.slice();
       const randomNumber = Math.floor(Math.random() * 6) + 1;
- // calculate location in array that matches current boardNumber     
-      let filteredBoard = workBoard.filter(function(currentElement) {
-        return (currentElement.boardNumber !== undefined && currentElement.invisible !== true);
+      // calculate location in array that matches current boardNumber
+      let filteredBoard = workBoard.filter(function (currentElement) {
+        return currentElement.boardNumber !== undefined && currentElement.invisible !== true;
       });
       const newPosition = Math.min(prevGameState.position + randomNumber, filteredBoard.length);
       let i;
       let newPositionBoard;
-      for (i=0; i < filteredBoard.length; i++) {
+      for (i = 0; i < filteredBoard.length; i++) {
         if (filteredBoard[i].boardNumber === newPosition) {
           newPositionBoard = filteredBoard[i].key - 1;
         }
@@ -138,13 +136,13 @@ export default function App() {
       }
       // Add the detour squares and remove a single square after detour
       if (workBoard[newPositionBoard].itemsToAdd !== undefined) {
-        let workBoard2 = workBoard.slice()
+        let workBoard2 = workBoard.slice();
         let i;
-        for (i=0; i < workBoard2.length; i++) {
+        for (i = 0; i < workBoard2.length; i++) {
           if (workBoard2[i].addItem !== undefined) {
             if (workBoard2[newPositionBoard].itemsToAdd === workBoard2[i].addItem) {
               workBoard2[i].invisible = false;
-              workBoard2[i].boardNumber = workBoard2[i].boardNumber + newPosition;          
+              workBoard2[i].boardNumber = workBoard2[i].boardNumber + newPosition;
             }
           }
           if (workBoard2[i].deleteItem !== undefined) {
@@ -153,8 +151,11 @@ export default function App() {
             }
           }
           if (workBoard2[i].boardNumber !== undefined) {
-            if (workBoard2[i].boardNumber > newPosition && workBoard2[i].invisible === undefined &&
-                workBoard2[i].addItem === undefined) {
+            if (
+              workBoard2[i].boardNumber > newPosition &&
+              workBoard2[i].invisible === undefined &&
+              workBoard2[i].addItem === undefined
+            ) {
               workBoard2[i].boardNumber = workBoard2[i].boardNumber + 6;
             }
           }
@@ -182,29 +183,19 @@ export default function App() {
     });
   }, []);
 
-// render
+  // render
   return (
     <View style={styles.container}>
-        <View style={styles.nav}>
-            <FlatList
-              data={nav}
-              renderItem={renderNav}
-              style={styles.nav}
-              numColumns={numColumns}
-            />
-            <View style={styles.message}>
-                <Text style={styles.message}>{message}</Text>
-                  <Text style={styles.message}>{optMessage}</Text>
-            </View>
+      <View style={styles.nav}>
+        <FlatList data={nav} renderItem={renderNav} style={styles.nav} numColumns={numColumns} />
+        <View style={styles.message}>
+          <Text style={styles.message}>{message}</Text>
+          <Text style={styles.message}>{optMessage}</Text>
         </View>
-        <View style={styles.board}>
-            <FlatList
-              data={board}
-              renderItem={renderBoard}
-              style={styles.board}
-              numColumns={numColumns}
-            />
-        </View> 
+      </View>
+      <View style={styles.board}>
+        <FlatList data={board} renderItem={renderBoard} style={styles.board} numColumns={numColumns} />
+      </View>
     </View>
   );
 }
@@ -250,6 +241,6 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   markSpot: {
-  backgroundColor: 'red',
-  }
+    backgroundColor: 'red',
+  },
 });
