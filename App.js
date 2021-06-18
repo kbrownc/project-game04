@@ -14,7 +14,7 @@ export default function App() {
 
   // Nav bar
   const nav = [
-    { key: 1, name: 'Play', invisible: false },
+    { key: 1, name: 'PLAY', invisible: false },
     { key: 2, name: '', invisible: true },
     { key: 3, name: '', invisible: true },
     { key: 4, name: '', invisible: true },
