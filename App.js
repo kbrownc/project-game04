@@ -30,7 +30,7 @@ export default function App() {
     if (item.invisible === true) {
       return <View style={[styles.item, styles.itemInvisible]} />;
     }
-    if (item.name === 'Play') {
+    if (item.name === 'PLAY') {
       return (
         <View style={styles.item}>
           <TouchableOpacity onPress={() => pressPlay()}>
@@ -59,7 +59,7 @@ export default function App() {
       return <View style={[styles.item, styles.itemInvisible]} />;
     }
     // Sho ROLL button
-    if (item.name === 'Roll') {
+    if (item.name === 'ROLL') {
       return (
         <View style={styles.item}>
           <TouchableOpacity onPress={() => pressRoll(item.key)}>
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     color: 'black',
-    fontSize: 30,
+    fontSize: 25,
     fontWeight: 'bold',
   },
   board: {
