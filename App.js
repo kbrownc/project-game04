@@ -14,7 +14,7 @@ export default function App() {
 
   // Nav bar
   const nav = [
-    { key: 1, name: 'Play', invisible: false },
+    { key: 1, name: 'PLAY', invisible: false },
     { key: 2, name: '', invisible: true },
     { key: 3, name: '', invisible: true },
     { key: 4, name: '', invisible: true },
@@ -30,7 +30,7 @@ export default function App() {
     if (item.invisible === true) {
       return <View style={[styles.item, styles.itemInvisible]} />;
     }
-    if (item.name === 'Play') {
+    if (item.name === 'PLAY') {
       return (
         <View style={styles.item}>
           <TouchableOpacity onPress={() => pressPlay()}>
@@ -58,8 +58,8 @@ export default function App() {
     if (item.invisible === true) {
       return <View style={[styles.item, styles.itemInvisible]} />;
     }
-    // Sho ROLL button
-    if (item.name === 'Roll') {
+    // Show ROLL button
+    if (item.name === 'ROLL') {
       return (
         <View style={styles.item}>
           <TouchableOpacity onPress={() => pressRoll(item.key)}>
@@ -204,7 +204,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginVertical: 20,
+    marginTop: 35,
   },
   nav: {
     flex: 2,
@@ -225,20 +225,21 @@ const styles = StyleSheet.create({
   },
   itemText: {
     color: '#fff',
+    fontSize: 10.
   },
   message: {
-    flex: 2,
+    flex: 3,
     alignItems: 'center',
     justifyContent: 'center',
     color: 'black',
-    fontSize: 30,
+    fontSize: 15,
     fontWeight: 'bold',
   },
   board: {
     flex: 7,
     fontSize: 10,
     fontWeight: 'bold',
-    marginVertical: 5,
+    marginVertical: 1,
   },
   markSpot: {
     backgroundColor: 'red',

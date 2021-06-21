@@ -2,7 +2,7 @@ let newBoard = [
     { key: 1,  boardNumber: 37, name: 'End' }, 
     { key: 2,  name: '', invisible: true }, 
     { key: 3,  name: '', invisible: true }, 
-    { key: 4,  name: 'Roll' },
+    { key: 4,  name: 'ROLL' },
     { key: 5,  name: '', invisible: true }, 
     { key: 6,  name: '', invisible: true }, 
     { key: 7,  boardNumber: 1, name: 'Start' },
