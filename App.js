@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { StyleSheet, Text, View, FlatList, Dimensions, TouchableOpacity} from 'react-native';
+import { StyleSheet, Text, View, FlatList, Dimensions, TouchableHighlight} from 'react-native';
 import { newBoard } from './newboard.js';
 
 export default function App() {
@@ -33,9 +33,9 @@ export default function App() {
     if (item.name === 'PLAY') {
       return (
         <View style={styles.item}>
-          <TouchableOpacity onPress={() => pressPlay()}>
+          <TouchableHighlight onPress={() => pressPlay()}>
             <Text style={styles.itemText}>{item.name}</Text>
-          </TouchableOpacity>
+          </TouchableHighlight>
         </View>
       );
     }
@@ -62,9 +62,9 @@ export default function App() {
     if (item.name === 'ROLL') {
       return (
         <View style={styles.item}>
-          <TouchableOpacity onPress={() => pressRoll(item.key)}>
+          <TouchableHighlight onPress={() => pressRoll(item.key)}>
             <Text style={styles.itemText}>{item.name}</Text>
-          </TouchableOpacity>
+          </TouchableHighlight>
         </View>
       );
     }
