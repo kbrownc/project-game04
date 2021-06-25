@@ -70,24 +70,21 @@ export default function App() {
         </View>
       );
     }
-    // Create Even button and mark if it has been selected 
-    //  This works==>  <View style={[styles.item, styles.markSpot]}>       
+    // Create Even button and mark if it has been selected      
      if (item.name === 'EVEN') {
-      console.log("got here 7",even);
        return (<View style=
-            {even ? {[styles.item, styles.markSpot]}> : {styles.item}>}
-          <TouchableHighlight onPress={() => pressEven()}>
+            {even ? [styles.item, styles.markSpot] : styles.item}
+          ><TouchableHighlight onPress={() => pressEven()}>
             <Text style={styles.itemText}>{item.name}</Text>
           </TouchableHighlight>
         </View>
        );
      }
     // Create Odd button and mark if it has been selected
-    // still need to mark button if selected
     if (item.name === 'ODD') {
-      return (
-        <View style={styles.item}>
-          <TouchableHighlight onPress={() => pressOdd()}>
+      return (<View style=
+            {odd ? [styles.item, styles.markSpot] : styles.item}
+          ><TouchableHighlight onPress={() => pressOdd()}>
             <Text style={styles.itemText}>{item.name}</Text>
           </TouchableHighlight>
         </View>
@@ -217,6 +214,7 @@ export default function App() {
     setGameState(prevGameState => {
       let workBoard = prevGameState.board.slice();
       const randomNumber = Math.floor(Math.random() * 6) + 1;
+      console.log("randomNumber",randomNumber);
       // Need to generate an err message and exit this routine
       if (even === true && odd === true){
         return;
