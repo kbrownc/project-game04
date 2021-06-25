@@ -1,10 +1,12 @@
 import React, { useState, useCallback } from 'react';
-import { StyleSheet, Text, View, FlatList, Dimensions, TouchableHighlight} from 'react-native';
+import { StyleSheet, Text, View, FlatList, Dimensions, TouchableHighlight } from 'react-native';
 import { newBoard } from './newboard.js';
 
 export default function App() {
-  const [{ roll, position, message, optMessage, score, board }, setGameState] = useState({
+  const [{ roll, even, odd, position, message, optMessage, score, board }, setGameState] = useState({
     roll: 0,
+    even: false,
+    odd: false,
     position: 0,
     message: 'Roll again',
     optMessage: 'Kim',
@@ -68,6 +70,29 @@ export default function App() {
         </View>
       );
     }
+    // Create Even button and mark if it has been selected 
+    //  This works==>  <View style={[styles.item, styles.markSpot]}>       
+     if (item.name === 'EVEN') {
+      console.log("got here 7",even);
+       return (<View style=
+            {even ? {[styles.item, styles.markSpot]}> : {styles.item}>}
+          <TouchableHighlight onPress={() => pressEven()}>
+            <Text style={styles.itemText}>{item.name}</Text>
+          </TouchableHighlight>
+        </View>
+       );
+     }
+    // Create Odd button and mark if it has been selected
+    // still need to mark button if selected
+    if (item.name === 'ODD') {
+      return (
+        <View style={styles.item}>
+          <TouchableHighlight onPress={() => pressOdd()}>
+            <Text style={styles.itemText}>{item.name}</Text>
+          </TouchableHighlight>
+        </View>
+      );
+    }
     // Show ROLL NUMBER
     if (item.key === 11) {
       return (
@@ -96,6 +121,8 @@ export default function App() {
     setGameState(() => {
       return {
         roll: null,
+        even: false,
+        odd: false,
         position: 0,
         message: 'Roll again',
         optMessage: 'Kim',
@@ -105,11 +132,107 @@ export default function App() {
     });
   }, []);
 
+  // press Even button
+  const pressEven = useCallback(() => {
+    setGameState(prevGameState => {
+      let workEven;
+      let workMessage = 'Roll again';
+      let workOptMessage = 'Kim';
+      if (prevGameState.even === true){
+        workEven = false;
+      } else {
+        workEven = true;
+      }
+      if (workEven === true && prevGameState.odd === true) {
+        workMessage = 'Select again';
+        workOptMessage = 'cannot select both ODD and EVEN'; 
+      }
+      if (workEven === false && prevGameState.odd === true) {
+        workMessage = 'Roll again';
+        workOptMessage = 'ODD selected'; 
+      }  
+      if (prevGameState.odd === false && workEven === true) {
+        workMessage = 'Roll again';
+        workOptMessage = 'EVEN selected'; 
+      }  
+      if (prevGameState.odd === false && workEven === false) {
+        workMessage = 'Roll again';
+        workOptMessage = 'Kim'; 
+      }             
+      return {
+        roll: prevGameState.roll,
+        even: workEven,
+        odd: prevGameState.odd,
+        position: prevGameState.position,
+        message: workMessage,
+        optMessage: workOptMessage,
+        score: prevGameState.score,
+        board: prevGameState.board,
+      };
+    });
+  }, []);
+
+  // press Odd button
+  const pressOdd = useCallback(() => {
+    setGameState(prevGameState => {
+      let workOdd;
+      let workMessage = 'Roll again';
+      let workOptMessage = 'Kim';
+      if (prevGameState.odd === true){
+        workOdd = false;
+      } else {
+        workOdd = true;
+      }
+      if (workOdd === true && prevGameState.even === true) {
+        workMessage = 'Select again';
+        workOptMessage = 'cannot select both ODD and EVEN'; 
+      }
+      if (workOdd === true && prevGameState.even === false) {
+        workMessage = 'Roll again';
+        workOptMessage = 'ODD selected'; 
+      }  
+      if (workOdd === false && prevGameState.even === true) {
+        workMessage = 'Roll again';
+        workOptMessage = 'EVEN selected'; 
+      }  
+      if (workOdd === false && prevGameState.even === false) {
+        workMessage = 'Roll again';
+        workOptMessage = 'Kim'; 
+      }       
+      return {
+        roll: prevGameState.roll,
+        even: prevGameState.even,
+        odd: workOdd,
+        position: prevGameState.position,
+        message: workMessage,
+        optMessage: workOptMessage,
+        score: prevGameState.score,
+        board: prevGameState.board,
+      };
+    });
+  }, []);
+
   // press Roll button
   const pressRoll = useCallback(() => {
     setGameState(prevGameState => {
       let workBoard = prevGameState.board.slice();
       const randomNumber = Math.floor(Math.random() * 6) + 1;
+      // Need to generate an err message and exit this routine
+      if (even === true && odd === true){
+        return;
+      }
+      if ((randomNumber === 1 || randomNumber === 3 || randomNumber === 5) && odd === true) {
+        randomNumber = randomNumber * 2;
+      }
+      if ((randomNumber === 2 || randomNumber === 4 || randomNumber === 6) && even === true) {
+        randomNumber = randomNumber * 2;
+      }
+      if ((randomNumber === 1 || randomNumber === 3 || randomNumber === 5) && even === true) {
+        randomNumber = 0;
+      }
+      if ((randomNumber === 2 || randomNumber === 4 || randomNumber === 6) && odd === true) {
+        randomNumber = 0;
+      }
       // calculate location in array that matches current boardNumber
       let filteredBoard = workBoard.filter(function (currentElement) {
         return currentElement.boardNumber !== undefined && currentElement.invisible !== true;
@@ -169,6 +292,8 @@ export default function App() {
         workOptMessage = 'Kim';
         workBoard[3].invisible = true;
         workBoard[10].invisible = true;
+        workBoard[9].invisible = true;
+        workBoard[11].invisible = true;
       } else {
         workMessage = 'Role Again';
       }
@@ -225,7 +350,7 @@ const styles = StyleSheet.create({
   },
   itemText: {
     color: '#fff',
-    fontSize: 10.
+    fontSize: 10,
   },
   message: {
     flex: 3,
