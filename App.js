@@ -70,21 +70,21 @@ export default function App() {
         </View>
       );
     }
-    // Create Even button and mark if it has been selected      
-     if (item.name === 'EVEN') {
-       return (<View style=
-            {even ? [styles.item, styles.markSpot] : styles.item}
-          ><TouchableHighlight onPress={() => pressEven()}>
+    // Create Even button and mark it if it has been selected
+    if (item.name === 'EVEN') {
+      return (
+        <View style={even ? [styles.item, styles.markSpot] : styles.item}>
+          <TouchableHighlight onPress={() => pressEven()}>
             <Text style={styles.itemText}>{item.name}</Text>
           </TouchableHighlight>
         </View>
-       );
-     }
-    // Create Odd button and mark if it has been selected
+      );
+    }
+    // Create Odd button and mark it if it has been selected
     if (item.name === 'ODD') {
-      return (<View style=
-            {odd ? [styles.item, styles.markSpot] : styles.item}
-          ><TouchableHighlight onPress={() => pressOdd()}>
+      return (
+        <View style={odd ? [styles.item, styles.markSpot] : styles.item}>
+          <TouchableHighlight onPress={() => pressOdd()}>
             <Text style={styles.itemText}>{item.name}</Text>
           </TouchableHighlight>
         </View>
@@ -135,27 +135,24 @@ export default function App() {
       let workEven;
       let workMessage = 'Roll again';
       let workOptMessage = 'Kim';
-      if (prevGameState.even === true){
+      if (prevGameState.even === true) {
         workEven = false;
       } else {
         workEven = true;
       }
       if (workEven === true && prevGameState.odd === true) {
-        workMessage = 'Select again';
-        workOptMessage = 'cannot select both ODD and EVEN'; 
+        workMessage = 'Roll again';
+        workOptMessage = 'cannot select both ODD and EVEN';
+        workEven = false;
       }
       if (workEven === false && prevGameState.odd === true) {
         workMessage = 'Roll again';
-        workOptMessage = 'ODD selected'; 
-      }  
+        workOptMessage = 'ODD selected';
+      }
       if (prevGameState.odd === false && workEven === true) {
         workMessage = 'Roll again';
-        workOptMessage = 'EVEN selected'; 
-      }  
-      if (prevGameState.odd === false && workEven === false) {
-        workMessage = 'Roll again';
-        workOptMessage = 'Kim'; 
-      }             
+        workOptMessage = 'EVEN selected';
+      }
       return {
         roll: prevGameState.roll,
         even: workEven,
@@ -175,27 +172,24 @@ export default function App() {
       let workOdd;
       let workMessage = 'Roll again';
       let workOptMessage = 'Kim';
-      if (prevGameState.odd === true){
+      if (prevGameState.odd === true) {
         workOdd = false;
       } else {
         workOdd = true;
       }
       if (workOdd === true && prevGameState.even === true) {
-        workMessage = 'Select again';
-        workOptMessage = 'cannot select both ODD and EVEN'; 
+        workMessage = 'Roll again';
+        workOptMessage = 'cannot select both ODD and EVEN';
+        workOdd = false;
       }
       if (workOdd === true && prevGameState.even === false) {
         workMessage = 'Roll again';
-        workOptMessage = 'ODD selected'; 
-      }  
+        workOptMessage = 'ODD selected';
+      }
       if (workOdd === false && prevGameState.even === true) {
         workMessage = 'Roll again';
-        workOptMessage = 'EVEN selected'; 
-      }  
-      if (workOdd === false && prevGameState.even === false) {
-        workMessage = 'Roll again';
-        workOptMessage = 'Kim'; 
-      }       
+        workOptMessage = 'EVEN selected';
+      }
       return {
         roll: prevGameState.roll,
         even: prevGameState.even,
@@ -213,23 +207,25 @@ export default function App() {
   const pressRoll = useCallback(() => {
     setGameState(prevGameState => {
       let workBoard = prevGameState.board.slice();
-      const randomNumber = Math.floor(Math.random() * 6) + 1;
-      console.log("randomNumber",randomNumber);
-      // Need to generate an err message and exit this routine
-      if (even === true && odd === true){
-        return;
-      }
-      if ((randomNumber === 1 || randomNumber === 3 || randomNumber === 5) && odd === true) {
+      let randomNumber = Math.floor(Math.random() * 6) + 1;
+      let scoreAdj = 1;
+      let workMessage = 'Roll again';
+      let workOptMessage = 'Kim';
+      if ((randomNumber === 1 || randomNumber === 3 || randomNumber === 5) && prevGameState.odd === true) {
         randomNumber = randomNumber * 2;
+        workMessage = 'roll doubled';
       }
-      if ((randomNumber === 2 || randomNumber === 4 || randomNumber === 6) && even === true) {
+      if ((randomNumber === 2 || randomNumber === 4 || randomNumber === 6) && prevGameState.even === true) {
         randomNumber = randomNumber * 2;
+        workMessage = 'roll doubled';
       }
-      if ((randomNumber === 1 || randomNumber === 3 || randomNumber === 5) && even === true) {
+      if ((randomNumber === 1 || randomNumber === 3 || randomNumber === 5) && prevGameState.even === true) {
         randomNumber = 0;
+        workMessage = 'roll set to 0';
       }
-      if ((randomNumber === 2 || randomNumber === 4 || randomNumber === 6) && odd === true) {
+      if ((randomNumber === 2 || randomNumber === 4 || randomNumber === 6) && prevGameState.odd === true) {
         randomNumber = 0;
+        workMessage = 'roll set to 0';
       }
       // calculate location in array that matches current boardNumber
       let filteredBoard = workBoard.filter(function (currentElement) {
@@ -243,9 +239,6 @@ export default function App() {
           newPositionBoard = filteredBoard[i].key - 1;
         }
       }
-      let scoreAdj = 1;
-      let workMessage = 'Roll again';
-      let workOptMessage = 'Kim';
       // Need to adjust score if 'miss a turn' or 'gain a turn' was landed on
       if (workBoard[newPositionBoard].extraScore !== undefined) {
         scoreAdj = scoreAdj + workBoard[newPositionBoard].extraScore;
@@ -292,11 +285,11 @@ export default function App() {
         workBoard[10].invisible = true;
         workBoard[9].invisible = true;
         workBoard[11].invisible = true;
-      } else {
-        workMessage = 'Role Again';
       }
       return {
         roll: randomNumber,
+        even: false,
+        odd: false,
         position: newPosition,
         message: workMessage,
         optMessage: workOptMessage,
