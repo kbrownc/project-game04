@@ -2,6 +2,8 @@ import React, { useState, useCallback } from 'react';
 import { StyleSheet, Text, View, FlatList, Dimensions, TouchableHighlight } from 'react-native';
 import { newBoard } from './newboard.js';
 
+const numColumns = 7;
+
 export default function App() {
   const [{ roll, even, odd, position, message, optMessage, score, board }, setGameState] = useState({
     roll: 0,
@@ -25,14 +27,12 @@ export default function App() {
     { key: 7, name: 0 },
   ];
 
-  const numColumns = 7;
-
   // render Nav Bar
   const renderNav = ({ item }) => {
+    const scoreNumberKey = 7;
     if (item.invisible === true) {
       return <View style={[styles.item, styles.itemInvisible]} />;
-    }
-    if (item.name === 'PLAY') {
+    } else if (item.name === 'PLAY') {
       return (
         <View style={styles.item}>
           <TouchableHighlight onPress={() => pressPlay()}>
@@ -40,8 +40,7 @@ export default function App() {
           </TouchableHighlight>
         </View>
       );
-    }
-    if (item.key === 7) {
+    } else if (item.key === scoreNumberKey) {
       return (
         <View style={styles.item}>
           <Text style={styles.itemText}>{score}</Text>
@@ -57,21 +56,20 @@ export default function App() {
 
   // render board
   const renderBoard = ({ item }) => {
+    const rollNumberKey = 11;
     if (item.invisible === true) {
       return <View style={[styles.item, styles.itemInvisible]} />;
-    }
     // Show ROLL button
-    if (item.name === 'ROLL') {
+    } else if (item.name === 'ROLL') {
       return (
         <View style={styles.item}>
-          <TouchableHighlight onPress={() => pressRoll(item.key)}>
+          <TouchableHighlight onPress={() => pressRoll()}>
             <Text style={styles.itemText}>{item.name}</Text>
           </TouchableHighlight>
         </View>
       );
-    }
     // Create Even button and mark it if it has been selected
-    if (item.name === 'EVEN') {
+    } else if (item.name === 'EVEN') {
       return (
         <View style={even ? [styles.item, styles.markSpot] : styles.item}>
           <TouchableHighlight onPress={() => pressEven()}>
@@ -79,9 +77,8 @@ export default function App() {
           </TouchableHighlight>
         </View>
       );
-    }
     // Create Odd button and mark it if it has been selected
-    if (item.name === 'ODD') {
+    } else if (item.name === 'ODD') {
       return (
         <View style={odd ? [styles.item, styles.markSpot] : styles.item}>
           <TouchableHighlight onPress={() => pressOdd()}>
@@ -89,35 +86,34 @@ export default function App() {
           </TouchableHighlight>
         </View>
       );
-    }
     // Show ROLL NUMBER
-    if (item.key === 11) {
+    } else if (item.key === rollNumberKey) {
       return (
         <View style={styles.item}>
           <Text style={styles.itemText}>{roll}</Text>
         </View>
       );
-    }
     // mark current spot on board
-    if (position === item.boardNumber && (item.invisible === undefined || item.invisible === false)) {
+    } else if (position === item.boardNumber && (item.invisible === undefined || item.invisible === false)) {
       return (
         <View style={[styles.item, styles.markSpot]}>
           <Text style={styles.itemText}></Text>
         </View>
       );
-    }
+    } else {
     return (
       <View style={styles.item}>
         <Text style={styles.itemText}>{item.name}</Text>
       </View>
     );
+    }
   };
 
   // press Play button
   const pressPlay = useCallback(() => {
     setGameState(() => {
       return {
-        roll: null,
+        roll: 0,
         even: false,
         odd: false,
         position: 0,
@@ -211,19 +207,16 @@ export default function App() {
       let scoreAdj = 1;
       let workMessage = 'Roll again';
       let workOptMessage = 'Kim';
-      if ((randomNumber === 1 || randomNumber === 3 || randomNumber === 5) && prevGameState.odd === true) {
+      if ((randomNumber % 2 === 1) && prevGameState.odd === true) {
         randomNumber = randomNumber * 2;
         workMessage = 'roll doubled';
-      }
-      if ((randomNumber === 2 || randomNumber === 4 || randomNumber === 6) && prevGameState.even === true) {
+      } else if ((randomNumber % 2 === 0) && prevGameState.even === true) {
         randomNumber = randomNumber * 2;
         workMessage = 'roll doubled';
-      }
-      if ((randomNumber === 1 || randomNumber === 3 || randomNumber === 5) && prevGameState.even === true) {
+      } else if ((randomNumber % 2 === 1) && prevGameState.even === true) {
         randomNumber = 0;
         workMessage = 'roll set to 0';
-      }
-      if ((randomNumber === 2 || randomNumber === 4 || randomNumber === 6) && prevGameState.odd === true) {
+      } else if ((randomNumber % 2 === 0) && prevGameState.odd === true) {
         randomNumber = 0;
         workMessage = 'roll set to 0';
       }
