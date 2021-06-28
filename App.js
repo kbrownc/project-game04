@@ -40,16 +40,10 @@ export default function App() {
           </TouchableHighlight>
         </View>
       );
-    } else if (item.key === scoreNumberKey) {
-      return (
-        <View style={styles.item}>
-          <Text style={styles.itemText}>{score}</Text>
-        </View>
-      );
     }
     return (
       <View style={styles.item}>
-        <Text style={styles.itemText}>{item.name}</Text>
+        <Text style={styles.itemText}>{item.key === scoreNumberKey ? score : item.name}</Text>
       </View>
     );
   };
@@ -59,7 +53,7 @@ export default function App() {
     const rollNumberKey = 11;
     if (item.invisible === true) {
       return <View style={[styles.item, styles.itemInvisible]} />;
-    // Show ROLL button
+      // Show ROLL button
     } else if (item.name === 'ROLL') {
       return (
         <View style={styles.item}>
@@ -68,32 +62,30 @@ export default function App() {
           </TouchableHighlight>
         </View>
       );
-    // Create Even button and mark it if it has been selected
-    } else if (item.name === 'EVEN') {
+      // Create Even or Odd button and mark it if it has been selected
+    } else if (item.name === 'EVEN' || item.name === 'ODD') {
+      const onPress = item.name === 'EVEN' ? pressEven : pressOdd;
       return (
-        <View style={even ? [styles.item, styles.markSpot] : styles.item}>
-          <TouchableHighlight onPress={() => pressEven()}>
+        <View
+          style={
+            (item.name === 'EVEN' && even) || (item.name === 'ODD' && odd)
+              ? [styles.item, styles.markSpot]
+              : styles.item
+          }
+        >
+          <TouchableHighlight onPress={onPress}>
             <Text style={styles.itemText}>{item.name}</Text>
           </TouchableHighlight>
         </View>
       );
-    // Create Odd button and mark it if it has been selected
-    } else if (item.name === 'ODD') {
-      return (
-        <View style={odd ? [styles.item, styles.markSpot] : styles.item}>
-          <TouchableHighlight onPress={() => pressOdd()}>
-            <Text style={styles.itemText}>{item.name}</Text>
-          </TouchableHighlight>
-        </View>
-      );
-    // Show ROLL NUMBER
+      // Show ROLL NUMBER
     } else if (item.key === rollNumberKey) {
       return (
         <View style={styles.item}>
           <Text style={styles.itemText}>{roll}</Text>
         </View>
       );
-    // mark current spot on board
+      // mark current spot on board
     } else if (position === item.boardNumber && (item.invisible === undefined || item.invisible === false)) {
       return (
         <View style={[styles.item, styles.markSpot]}>
@@ -101,11 +93,11 @@ export default function App() {
         </View>
       );
     } else {
-    return (
-      <View style={styles.item}>
-        <Text style={styles.itemText}>{item.name}</Text>
-      </View>
-    );
+      return (
+        <View style={styles.item}>
+          <Text style={styles.itemText}>{item.name}</Text>
+        </View>
+      );
     }
   };
 
@@ -207,16 +199,16 @@ export default function App() {
       let scoreAdj = 1;
       let workMessage = 'Roll again';
       let workOptMessage = 'Kim';
-      if ((randomNumber % 2 === 1) && prevGameState.odd === true) {
+      if (randomNumber % 2 === 1 && prevGameState.odd === true) {
         randomNumber = randomNumber * 2;
         workMessage = 'roll doubled';
-      } else if ((randomNumber % 2 === 0) && prevGameState.even === true) {
+      } else if (randomNumber % 2 === 0 && prevGameState.even === true) {
         randomNumber = randomNumber * 2;
         workMessage = 'roll doubled';
-      } else if ((randomNumber % 2 === 1) && prevGameState.even === true) {
+      } else if (randomNumber % 2 === 1 && prevGameState.even === true) {
         randomNumber = 0;
         workMessage = 'roll set to 0';
-      } else if ((randomNumber % 2 === 0) && prevGameState.odd === true) {
+      } else if (randomNumber % 2 === 0 && prevGameState.odd === true) {
         randomNumber = 0;
         workMessage = 'roll set to 0';
       }
