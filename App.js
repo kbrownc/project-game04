@@ -130,7 +130,7 @@ export default function App() {
       }
       if (workEven === true && prevGameState.odd === true) {
         workMessage = 'Roll again';
-        workOptMessage = 'cannot select both ODD and EVEN';
+        workOptMessage = 'Cannot select both ODD and EVEN';
         workEven = false;
       }
       if (workEven === false && prevGameState.odd === true) {
@@ -167,7 +167,7 @@ export default function App() {
       }
       if (workOdd === true && prevGameState.even === true) {
         workMessage = 'Roll again';
-        workOptMessage = 'cannot select both ODD and EVEN';
+        workOptMessage = 'Cannot select both ODD and EVEN';
         workOdd = false;
       }
       if (workOdd === true && prevGameState.even === false) {
@@ -201,19 +201,20 @@ export default function App() {
       let workOptMessage = 'Kim';
       if (randomNumber % 2 === 1 && prevGameState.odd === true) {
         randomNumber = randomNumber * 2;
-        workMessage = 'roll doubled';
+        workMessage = 'Great...roll doubled';
       } else if (randomNumber % 2 === 0 && prevGameState.even === true) {
         randomNumber = randomNumber * 2;
-        workMessage = 'roll doubled';
+        workMessage = 'Great...roll doubled';
       } else if (randomNumber % 2 === 1 && prevGameState.even === true) {
         randomNumber = 0;
-        workMessage = 'roll set to 0';
+        workMessage = 'Woops...roll set to 0';
       } else if (randomNumber % 2 === 0 && prevGameState.odd === true) {
         randomNumber = 0;
-        workMessage = 'roll set to 0';
+        workMessage = 'Woops...roll set to 0';
       }
       // calculate location in array that matches current boardNumber
-      let filteredBoard = workBoard.filter(function (currentElement) {
+      //let filteredBoard = workBoard.map((currentElement, index) => ({ ...currentElement, key1: index })).filter((currentElement) => {
+      let filteredBoard = workBoard.filter((currentElement) => {
         return currentElement.boardNumber !== undefined && currentElement.invisible !== true;
       });
       const newPosition = Math.min(prevGameState.position + randomNumber, filteredBoard.length);
