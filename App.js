@@ -276,12 +276,20 @@ export default function App() {
           <Text style={styles.itemText}>ODD</Text>
           </TouchableHighlight>
         </View>
-        <View style={styles.item}>
+        <View 
+          style={
+            (message === 'Game Complete') ? styles.itemInvisible : styles.item
+          }
+        >
         <TouchableHighlight onPress={() => pressRoll()}>
           <Text style={styles.itemText}>ROLL</Text>
           </TouchableHighlight>
         </View>
-        <View style={styles.item}>
+        <View 
+          style={
+            (message === 'Game Complete') ? styles.itemInvisible : styles.item
+          }
+        >
           <Text style={styles.itemText}>{roll}</Text>
         </View>
         <View style={styles.item}>
