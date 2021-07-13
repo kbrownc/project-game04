@@ -16,38 +16,6 @@ export default function App() {
     board: JSON.parse(JSON.stringify(newBoard)),
   });
 
-  // Nav bar
-  const nav = [
-    { key: 1, name: 'PLAY', invisible: false },
-    { key: 2, name: '', invisible: true },
-    { key: 3, name: '', invisible: true },
-    { key: 4, name: '', invisible: true },
-    { key: 5, name: '', invisible: true },
-    { key: 6, name: 'Score' },
-    { key: 7, name: 0 },
-  ];
-
-  // render Nav Bar
-  const renderNav = ({ item }) => {
-    const scoreNumberKey = 7;
-    if (item.invisible === true) {
-      return <View style={[styles.item, styles.itemInvisible]} />;
-    } else if (item.name === 'PLAY') {
-      return (
-        <View style={styles.item}>
-          <TouchableHighlight onPress={() => pressPlay()}>
-            <Text style={styles.itemText}>{item.name}</Text>
-          </TouchableHighlight>
-        </View>
-      );
-    }
-    return (
-      <View style={styles.item}>
-        <Text style={styles.itemText}>{item.key === scoreNumberKey ? score : item.name}</Text>
-      </View>
-    );
-  };
-
   // render board
   const renderBoard = ({ item }) => {
     const rollNumberKey = 11;
@@ -69,7 +37,7 @@ export default function App() {
         <View
           style={
             (item.name === 'EVEN' && even) || (item.name === 'ODD' && odd)
-              ? [styles.item, styles.markSpot]
+              ? [styles.item, styles.markSpot1]
               : styles.item
           }
         >
@@ -88,7 +56,7 @@ export default function App() {
       // mark current spot on board
     } else if (position === item.boardNumber && (item.invisible === undefined || item.invisible === false)) {
       return (
-        <View style={[styles.item, styles.markSpot]}>
+        <View style={[styles.item, styles.markSpot1]}>
           <Text style={styles.itemText}></Text>
         </View>
       );
@@ -101,8 +69,8 @@ export default function App() {
     }
   };
 
-  // press Play button
-  const pressPlay = useCallback(() => {
+  // press Reset button
+  const pressReset = useCallback(() => {
     setGameState(() => {
       return {
         roll: 0,
@@ -214,12 +182,12 @@ export default function App() {
       }
       // calculate location in array that matches current boardNumber
       //let filteredBoard = workBoard.map((currentElement, index) => ({ ...currentElement, key1: index })).filter((currentElement) => {
-      let filteredBoard = workBoard.filter((currentElement) => {
+      let filteredBoard = workBoard.filter(currentElement => {
         return currentElement.boardNumber !== undefined && currentElement.invisible !== true;
       });
       const newPosition = Math.min(prevGameState.position + randomNumber, filteredBoard.length);
       let i;
-      let newPositionBoard;
+      let newPositionBoard = 0;
       for (i = 0; i < filteredBoard.length; i++) {
         if (filteredBoard[i].boardNumber === newPosition) {
           newPositionBoard = filteredBoard[i].key - 1;
@@ -267,10 +235,6 @@ export default function App() {
       if (newPosition >= filteredBoard.length) {
         workMessage = 'Game Complete';
         workOptMessage = 'Kim';
-        workBoard[3].invisible = true;
-        workBoard[10].invisible = true;
-        workBoard[9].invisible = true;
-        workBoard[11].invisible = true;
       }
       return {
         roll: randomNumber,
@@ -289,12 +253,48 @@ export default function App() {
   return (
     <View style={styles.container}>
       <View style={styles.nav}>
-        <FlatList data={nav} renderItem={renderNav} style={styles.nav} numColumns={numColumns} />
+        <View style={styles.item}>
+          <TouchableHighlight onPress={() => pressReset()}>
+            <Text style={styles.itemText}>RESET</Text>
+          </TouchableHighlight>
+        </View>
+        <View
+          style={
+            (even) ? [styles.item, styles.markSpot1] : styles.item
+          }
+        >
+        <TouchableHighlight onPress={() => pressEven()}>
+          <Text style={styles.itemText}>EVEN</Text>
+          </TouchableHighlight>
+        </View>
+        <View
+          style={
+            (odd) ? [styles.item, styles.markSpot1] : styles.item
+          }
+        >
+        <TouchableHighlight onPress={() => pressOdd()}>
+          <Text style={styles.itemText}>ODD</Text>
+          </TouchableHighlight>
+        </View>
+        <View style={styles.item}>
+        <TouchableHighlight onPress={() => pressRoll()}>
+          <Text style={styles.itemText}>ROLL</Text>
+          </TouchableHighlight>
+        </View>
+        <View style={styles.item}>
+          <Text style={styles.itemText}>{roll}</Text>
+        </View>
+        <View style={styles.item}>
+          <Text style={styles.itemText}>SCORE</Text>
+        </View>
+         <View style={styles.item}>
+          <Text style={styles.itemText}>{score}</Text>
+        </View>
+      </View>
         <View style={styles.message}>
           <Text style={styles.message}>{message}</Text>
           <Text style={styles.message}>{optMessage}</Text>
         </View>
-      </View>
       <View style={styles.board}>
         <FlatList data={board} renderItem={renderBoard} style={styles.board} numColumns={numColumns} />
       </View>
@@ -309,10 +309,10 @@ const styles = StyleSheet.create({
     marginTop: 35,
   },
   nav: {
-    flex: 2,
+    flex: 0,
     fontSize: 10,
     fontWeight: 'bold',
-    marginVertical: 1,
+    flexDirection: 'row',
   },
   item: {
     backgroundColor: 'green',
@@ -330,12 +330,13 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   message: {
-    flex: 3,
-    alignItems: 'center',
+    flex: 1,
     justifyContent: 'center',
+    flexDirection: 'column',
     color: 'black',
-    fontSize: 15,
+    fontSize: 20,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   board: {
     flex: 7,
@@ -343,7 +344,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginVertical: 1,
   },
-  markSpot: {
+  markSpot1: {
     backgroundColor: 'red',
+  },
+  markSpot2: {
+    backgroundColor: 'black',
   },
 });
