@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { StyleSheet, Text, View, FlatList, Dimensions, TouchableHighlight } from 'react-native';
+import { StyleSheet, Text, View, FlatList, Dimensions, TouchableHighlight, Button } from 'react-native';
 import { newBoard } from './newboard.js';
 
 const numColumns = 7;
@@ -11,7 +11,7 @@ export default function App() {
     odd: false,
     position: 0,
     message: 'Roll again',
-    optMessage: 'Kim',
+    optMessage: 'Player',
     score: 0,
     board: JSON.parse(JSON.stringify(newBoard)),
   });
@@ -78,7 +78,7 @@ export default function App() {
         odd: false,
         position: 0,
         message: 'Roll again',
-        optMessage: 'Kim',
+        optMessage: 'Player',
         score: 0,
         board: JSON.parse(JSON.stringify(newBoard)),
       };
@@ -90,15 +90,13 @@ export default function App() {
     setGameState(prevGameState => {
       let workEven;
       let workMessage = 'Roll again';
-      let workOptMessage = 'Kim';
+      let workOptMessage = 'Player';
       if (prevGameState.even === true) {
         workEven = false;
       } else {
         workEven = true;
       }
       if (workEven === true && prevGameState.odd === true) {
-        workMessage = 'Roll again';
-        workOptMessage = 'Cannot select both ODD and EVEN';
         workEven = false;
       }
       if (workEven === false && prevGameState.odd === true) {
@@ -127,15 +125,13 @@ export default function App() {
     setGameState(prevGameState => {
       let workOdd;
       let workMessage = 'Roll again';
-      let workOptMessage = 'Kim';
+      let workOptMessage = 'Player';
       if (prevGameState.odd === true) {
         workOdd = false;
       } else {
         workOdd = true;
       }
       if (workOdd === true && prevGameState.even === true) {
-        workMessage = 'Roll again';
-        workOptMessage = 'Cannot select both ODD and EVEN';
         workOdd = false;
       }
       if (workOdd === true && prevGameState.even === false) {
@@ -166,7 +162,7 @@ export default function App() {
       let randomNumber = Math.floor(Math.random() * 6) + 1;
       let scoreAdj = 1;
       let workMessage = 'Roll again';
-      let workOptMessage = 'Kim';
+      let workOptMessage = 'Player';
       if (randomNumber % 2 === 1 && prevGameState.odd === true) {
         randomNumber = randomNumber * 2;
         workMessage = 'Great...roll doubled';
@@ -234,7 +230,7 @@ export default function App() {
       // Check for end of Game
       if (newPosition >= filteredBoard.length) {
         workMessage = 'Game Complete';
-        workOptMessage = 'Kim';
+        workOptMessage = 'Player';
       }
       return {
         roll: randomNumber,
@@ -253,15 +249,15 @@ export default function App() {
   return (
     <View style={styles.container}>
       <View style={styles.nav}>
-        <View style={styles.item}>
-          <TouchableHighlight onPress={() => pressReset()}>
-            <Text style={styles.itemText}>RESET</Text>
-          </TouchableHighlight>
-        </View>
+        <Button
+          onPress={() => pressReset()}
+          title="RESET"
+          color="blue"
+        />
         <View
           style={
             (message === 'Game Complete') ? styles.itemInvisible : (
-            even ? [styles.item, styles.markSpot1] : styles.item )
+            even ? [styles.item, styles.markSpot1] : [styles.item, styles.itemBlue] )
           }
         >
         <TouchableHighlight onPress={() => pressEven()}>
@@ -271,22 +267,19 @@ export default function App() {
         <View
           style={
             (message === 'Game Complete') ? styles.itemInvisible : (
-            odd ? [styles.item, styles.markSpot1] : styles.item )
+            odd ? [styles.item, styles.markSpot1] : [styles.item, styles.itemBlue] )
           }
         >
         <TouchableHighlight onPress={() => pressOdd()}>
           <Text style={styles.itemText}>ODD</Text>
           </TouchableHighlight>
         </View>
-        <View 
-          style={
-            (message === 'Game Complete') ? styles.itemInvisible : styles.item
-          }
-        >
-        <TouchableHighlight onPress={() => pressRoll()}>
-          <Text style={styles.itemText}>ROLL</Text>
-          </TouchableHighlight>
-        </View>
+        <Button
+          onPress={() => pressRoll()}
+          title="ROLL"
+          color="blue"
+          disabled={(message === 'Game Complete') ? true : false}
+        />
         <View 
           style={
             (message === 'Game Complete') ? styles.itemInvisible : styles.item
@@ -331,6 +324,9 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 1,
     height: Dimensions.get('window').width / 15,
+  },
+  itemBlue: {
+    backgroundColor: 'blue',
   },
   itemInvisible: {
     backgroundColor: 'transparent',
