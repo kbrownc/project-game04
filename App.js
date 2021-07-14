@@ -260,7 +260,8 @@ export default function App() {
         </View>
         <View
           style={
-            (even) ? [styles.item, styles.markSpot1] : styles.item
+            (message === 'Game Complete') ? styles.itemInvisible : (
+            even ? [styles.item, styles.markSpot1] : styles.item )
           }
         >
         <TouchableHighlight onPress={() => pressEven()}>
@@ -269,7 +270,8 @@ export default function App() {
         </View>
         <View
           style={
-            (odd) ? [styles.item, styles.markSpot1] : styles.item
+            (message === 'Game Complete') ? styles.itemInvisible : (
+            odd ? [styles.item, styles.markSpot1] : styles.item )
           }
         >
         <TouchableHighlight onPress={() => pressOdd()}>
