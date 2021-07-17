@@ -5,7 +5,7 @@ import { newBoard } from './newboard.js';
 const numColumns = 7;
 
 export default function App() {
-  const [{ roll, even, odd, position, message, optMessage, score, board }, setGameState] = useState({
+  const [{ roll, even, odd, position, message, optMessage, score, board, endOfGame }, setGameState] = useState({
     roll: 0,
     even: false,
     odd: false,
@@ -14,6 +14,7 @@ export default function App() {
     optMessage: 'Player',
     score: 0,
     board: JSON.parse(JSON.stringify(newBoard)),
+    endOfGame: false,
   });
 
   // render board
@@ -81,6 +82,7 @@ export default function App() {
         optMessage: 'Player',
         score: 0,
         board: JSON.parse(JSON.stringify(newBoard)),
+        endOfGame: false,
       };
     });
   }, []);
@@ -116,6 +118,7 @@ export default function App() {
         optMessage: workOptMessage,
         score: prevGameState.score,
         board: prevGameState.board,
+        endOfGame: prevGameState.endOfGame,
       };
     });
   }, []);
@@ -151,6 +154,7 @@ export default function App() {
         optMessage: workOptMessage,
         score: prevGameState.score,
         board: prevGameState.board,
+        endOfGame: prevGameState.endOfGame,
       };
     });
   }, []);
@@ -163,6 +167,7 @@ export default function App() {
       let scoreAdj = 1;
       let workMessage = 'Roll again';
       let workOptMessage = 'Player';
+      let workEndOfGame = false;
       if (randomNumber % 2 === 1 && prevGameState.odd === true) {
         randomNumber = randomNumber * 2;
         workMessage = 'Great...roll doubled';
@@ -231,6 +236,7 @@ export default function App() {
       if (newPosition >= filteredBoard.length) {
         workMessage = 'Game Complete';
         workOptMessage = 'Player';
+        workEndOfGame = true;
       }
       return {
         roll: randomNumber,
@@ -241,6 +247,7 @@ export default function App() {
         optMessage: workOptMessage,
         score: prevGameState.score + scoreAdj,
         board: workBoard,
+        endOfGame: workEndOfGame,
       };
     });
   }, []);
@@ -256,7 +263,7 @@ export default function App() {
         />
         <View
           style={
-            (message === 'Game Complete') ? styles.itemInvisible : (
+            (endOfGame) ? styles.itemInvisible : (
             even ? [styles.item, styles.markSpot1] : [styles.item, styles.itemBlue] )
           }
         >
@@ -266,7 +273,7 @@ export default function App() {
         </View>
         <View
           style={
-            (message === 'Game Complete') ? styles.itemInvisible : (
+            (endOfGame) ? styles.itemInvisible : (
             odd ? [styles.item, styles.markSpot1] : [styles.item, styles.itemBlue] )
           }
         >
@@ -278,11 +285,11 @@ export default function App() {
           onPress={() => pressRoll()}
           title="ROLL"
           color="blue"
-          disabled={(message === 'Game Complete') ? true : false}
+          disabled={(endOfGame) ? true : false}
         />
         <View 
           style={
-            (message === 'Game Complete') ? styles.itemInvisible : styles.item
+            (endOfGame) ? styles.itemInvisible : styles.item
           }
         >
           <Text style={styles.itemText}>{roll}</Text>
