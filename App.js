@@ -5,7 +5,10 @@ import { newBoard } from './newboard.js';
 const numColumns = 7;
 
 export default function App() {
-  const [{ roll, even, odd, position, message, optMessage, score, board, endOfGame }, setGameState] = useState({
+  const [
+    { roll, even, odd, position, message, optMessage, score, board, endOfGame },
+    setGameState,
+  ] = useState({
     roll: 0,
     even: false,
     odd: false,
@@ -256,55 +259,48 @@ export default function App() {
   return (
     <View style={styles.container}>
       <View style={styles.nav}>
-        <Button
-          onPress={() => pressReset()}
-          title="RESET"
-          color="blue"
-        />
+        <Button onPress={() => pressReset()} title="RESET" color="blue" />
         <View
           style={
-            (endOfGame) ? styles.itemInvisible : (
-            even ? [styles.item, styles.markSpot1] : [styles.item, styles.itemBlue] )
+            endOfGame
+              ? styles.itemInvisible
+              : even
+              ? [styles.item, styles.markSpot1]
+              : [styles.item, styles.itemBlue]
           }
         >
-        <TouchableHighlight onPress={() => pressEven()}>
-          <Text style={styles.itemText}>EVEN</Text>
+          <TouchableHighlight onPress={() => pressEven()}>
+            <Text style={styles.itemText}>EVEN</Text>
           </TouchableHighlight>
         </View>
         <View
           style={
-            (endOfGame) ? styles.itemInvisible : (
-            odd ? [styles.item, styles.markSpot1] : [styles.item, styles.itemBlue] )
+            endOfGame
+              ? styles.itemInvisible
+              : odd
+              ? [styles.item, styles.markSpot1]
+              : [styles.item, styles.itemBlue]
           }
         >
-        <TouchableHighlight onPress={() => pressOdd()}>
-          <Text style={styles.itemText}>ODD</Text>
+          <TouchableHighlight onPress={() => pressOdd()}>
+            <Text style={styles.itemText}>ODD</Text>
           </TouchableHighlight>
         </View>
-        <Button
-          onPress={() => pressRoll()}
-          title="ROLL"
-          color="blue"
-          disabled={(endOfGame) ? true : false}
-        />
-        <View 
-          style={
-            (endOfGame) ? styles.itemInvisible : styles.item
-          }
-        >
+        <Button onPress={() => pressRoll()} title="ROLL" color="blue" disabled={endOfGame ? true : false} />
+        <View style={endOfGame ? styles.itemInvisible : styles.item}>
           <Text style={styles.itemText}>{roll}</Text>
         </View>
         <View style={styles.item}>
           <Text style={styles.itemText}>SCORE</Text>
         </View>
-         <View style={styles.item}>
+        <View style={styles.item}>
           <Text style={styles.itemText}>{score}</Text>
         </View>
       </View>
-        <View style={styles.message}>
-          <Text style={styles.message}>{message}</Text>
-          <Text style={styles.message}>{optMessage}</Text>
-        </View>
+      <View style={styles.message}>
+        <Text style={styles.message}>{message}</Text>
+        <Text style={styles.message}>{optMessage}</Text>
+      </View>
       <View style={styles.board}>
         <FlatList data={board} renderItem={renderBoard} style={styles.board} numColumns={numColumns} />
       </View>
