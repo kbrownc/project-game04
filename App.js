@@ -1,52 +1,24 @@
 import React, { useState, useCallback } from 'react';
-import { StyleSheet, Text, View, FlatList, Dimensions, TouchableHighlight } from 'react-native';
+import { StyleSheet, Text, View, FlatList, Dimensions, TouchableHighlight, Button } from 'react-native';
 import { newBoard } from './newboard.js';
 
 const numColumns = 7;
 
 export default function App() {
-  const [{ roll, even, odd, position, message, optMessage, score, board }, setGameState] = useState({
+  const [
+    { roll, even, odd, position, message, optMessage, score, board, endOfGame },
+    setGameState,
+  ] = useState({
     roll: 0,
     even: false,
     odd: false,
     position: 0,
     message: 'Roll again',
-    optMessage: 'Kim',
+    optMessage: 'Player',
     score: 0,
     board: JSON.parse(JSON.stringify(newBoard)),
+    endOfGame: false,
   });
-
-  // Nav bar
-  const nav = [
-    { key: 1, name: 'PLAY', invisible: false },
-    { key: 2, name: '', invisible: true },
-    { key: 3, name: '', invisible: true },
-    { key: 4, name: '', invisible: true },
-    { key: 5, name: '', invisible: true },
-    { key: 6, name: 'Score' },
-    { key: 7, name: 0 },
-  ];
-
-  // render Nav Bar
-  const renderNav = ({ item }) => {
-    const scoreNumberKey = 7;
-    if (item.invisible === true) {
-      return <View style={[styles.item, styles.itemInvisible]} />;
-    } else if (item.name === 'PLAY') {
-      return (
-        <View style={styles.item}>
-          <TouchableHighlight onPress={() => pressPlay()}>
-            <Text style={styles.itemText}>{item.name}</Text>
-          </TouchableHighlight>
-        </View>
-      );
-    }
-    return (
-      <View style={styles.item}>
-        <Text style={styles.itemText}>{item.key === scoreNumberKey ? score : item.name}</Text>
-      </View>
-    );
-  };
 
   // render board
   const renderBoard = ({ item }) => {
@@ -69,7 +41,7 @@ export default function App() {
         <View
           style={
             (item.name === 'EVEN' && even) || (item.name === 'ODD' && odd)
-              ? [styles.item, styles.markSpot]
+              ? [styles.item, styles.markSpot1]
               : styles.item
           }
         >
@@ -88,7 +60,7 @@ export default function App() {
       // mark current spot on board
     } else if (position === item.boardNumber && (item.invisible === undefined || item.invisible === false)) {
       return (
-        <View style={[styles.item, styles.markSpot]}>
+        <View style={[styles.item, styles.markSpot1]}>
           <Text style={styles.itemText}></Text>
         </View>
       );
@@ -101,8 +73,8 @@ export default function App() {
     }
   };
 
-  // press Play button
-  const pressPlay = useCallback(() => {
+  // press Reset button
+  const pressReset = useCallback(() => {
     setGameState(() => {
       return {
         roll: 0,
@@ -110,9 +82,10 @@ export default function App() {
         odd: false,
         position: 0,
         message: 'Roll again',
-        optMessage: 'Kim',
+        optMessage: 'Player',
         score: 0,
         board: JSON.parse(JSON.stringify(newBoard)),
+        endOfGame: false,
       };
     });
   }, []);
@@ -122,15 +95,13 @@ export default function App() {
     setGameState(prevGameState => {
       let workEven;
       let workMessage = 'Roll again';
-      let workOptMessage = 'Kim';
+      let workOptMessage = 'Player';
       if (prevGameState.even === true) {
         workEven = false;
       } else {
         workEven = true;
       }
       if (workEven === true && prevGameState.odd === true) {
-        workMessage = 'Roll again';
-        workOptMessage = 'Cannot select both ODD and EVEN';
         workEven = false;
       }
       if (workEven === false && prevGameState.odd === true) {
@@ -150,6 +121,7 @@ export default function App() {
         optMessage: workOptMessage,
         score: prevGameState.score,
         board: prevGameState.board,
+        endOfGame: prevGameState.endOfGame,
       };
     });
   }, []);
@@ -159,15 +131,13 @@ export default function App() {
     setGameState(prevGameState => {
       let workOdd;
       let workMessage = 'Roll again';
-      let workOptMessage = 'Kim';
+      let workOptMessage = 'Player';
       if (prevGameState.odd === true) {
         workOdd = false;
       } else {
         workOdd = true;
       }
       if (workOdd === true && prevGameState.even === true) {
-        workMessage = 'Roll again';
-        workOptMessage = 'Cannot select both ODD and EVEN';
         workOdd = false;
       }
       if (workOdd === true && prevGameState.even === false) {
@@ -187,6 +157,7 @@ export default function App() {
         optMessage: workOptMessage,
         score: prevGameState.score,
         board: prevGameState.board,
+        endOfGame: prevGameState.endOfGame,
       };
     });
   }, []);
@@ -198,7 +169,8 @@ export default function App() {
       let randomNumber = Math.floor(Math.random() * 6) + 1;
       let scoreAdj = 1;
       let workMessage = 'Roll again';
-      let workOptMessage = 'Kim';
+      let workOptMessage = 'Player';
+      let workEndOfGame = false;
       if (randomNumber % 2 === 1 && prevGameState.odd === true) {
         randomNumber = randomNumber * 2;
         workMessage = 'Great...roll doubled';
@@ -214,12 +186,12 @@ export default function App() {
       }
       // calculate location in array that matches current boardNumber
       //let filteredBoard = workBoard.map((currentElement, index) => ({ ...currentElement, key1: index })).filter((currentElement) => {
-      let filteredBoard = workBoard.filter((currentElement) => {
+      let filteredBoard = workBoard.filter(currentElement => {
         return currentElement.boardNumber !== undefined && currentElement.invisible !== true;
       });
       const newPosition = Math.min(prevGameState.position + randomNumber, filteredBoard.length);
       let i;
-      let newPositionBoard;
+      let newPositionBoard = 0;
       for (i = 0; i < filteredBoard.length; i++) {
         if (filteredBoard[i].boardNumber === newPosition) {
           newPositionBoard = filteredBoard[i].key - 1;
@@ -266,11 +238,8 @@ export default function App() {
       // Check for end of Game
       if (newPosition >= filteredBoard.length) {
         workMessage = 'Game Complete';
-        workOptMessage = 'Kim';
-        workBoard[3].invisible = true;
-        workBoard[10].invisible = true;
-        workBoard[9].invisible = true;
-        workBoard[11].invisible = true;
+        workOptMessage = 'Player';
+        workEndOfGame = true;
       }
       return {
         roll: randomNumber,
@@ -281,6 +250,7 @@ export default function App() {
         optMessage: workOptMessage,
         score: prevGameState.score + scoreAdj,
         board: workBoard,
+        endOfGame: workEndOfGame,
       };
     });
   }, []);
@@ -289,11 +259,47 @@ export default function App() {
   return (
     <View style={styles.container}>
       <View style={styles.nav}>
-        <FlatList data={nav} renderItem={renderNav} style={styles.nav} numColumns={numColumns} />
-        <View style={styles.message}>
-          <Text style={styles.message}>{message}</Text>
-          <Text style={styles.message}>{optMessage}</Text>
+        <Button onPress={() => pressReset()} title="Reset" color="blue" />
+        <View
+          style={
+            endOfGame
+              ? styles.itemInvisible
+              : even
+              ? [styles.item, styles.markSpot1]
+              : [styles.item, styles.itemBlue]
+          }
+        >
+          <TouchableHighlight onPress={() => pressEven()}>
+            <Text style={styles.itemText}>Even</Text>
+          </TouchableHighlight>
         </View>
+        <View
+          style={
+            endOfGame
+              ? styles.itemInvisible
+              : odd
+              ? [styles.item, styles.markSpot1]
+              : [styles.item, styles.itemBlue]
+          }
+        >
+          <TouchableHighlight onPress={() => pressOdd()}>
+            <Text style={styles.itemText}>Odd</Text>
+          </TouchableHighlight>
+        </View>
+        <Button onPress={() => pressRoll()} title="Roll" color="blue" disabled={endOfGame ? true : false} />
+        <View style={endOfGame ? styles.itemInvisible : styles.itemNav}>
+          <Text style={styles.itemText}>{roll}</Text>
+        </View>
+        <View style={styles.itemNav}>
+          <Text style={styles.itemText}>Score</Text>
+        </View>
+        <View style={styles.itemNav}>
+          <Text style={styles.itemText}>{score}</Text>
+        </View>
+      </View>
+      <View style={styles.message}>
+        <Text style={styles.message}>{message}</Text>
+        <Text style={styles.message}>{optMessage}</Text>
       </View>
       <View style={styles.board}>
         <FlatList data={board} renderItem={renderBoard} style={styles.board} numColumns={numColumns} />
@@ -309,10 +315,9 @@ const styles = StyleSheet.create({
     marginTop: 35,
   },
   nav: {
-    flex: 2,
-    fontSize: 10,
+    flex: 0,
     fontWeight: 'bold',
-    marginVertical: 1,
+    flexDirection: 'row',
   },
   item: {
     backgroundColor: 'green',
@@ -322,20 +327,32 @@ const styles = StyleSheet.create({
     margin: 1,
     height: Dimensions.get('window').width / 15,
   },
+  itemNav: {
+    backgroundColor: 'green',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    margin: 1,
+    height: 45,
+  },
+  itemBlue: {
+    backgroundColor: 'blue',
+  },
   itemInvisible: {
     backgroundColor: 'transparent',
   },
   itemText: {
     color: '#fff',
-    fontSize: 10,
+    fontSize: 8,
   },
   message: {
-    flex: 3,
-    alignItems: 'center',
+    flex: 1,
     justifyContent: 'center',
+    flexDirection: 'column',
     color: 'black',
-    fontSize: 15,
+    fontSize: 20,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   board: {
     flex: 7,
@@ -343,7 +360,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginVertical: 1,
   },
-  markSpot: {
+  markSpot1: {
     backgroundColor: 'red',
+  },
+  markSpot2: {
+    backgroundColor: 'black',
   },
 });
