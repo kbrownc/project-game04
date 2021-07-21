@@ -287,13 +287,13 @@ export default function App() {
           </TouchableHighlight>
         </View>
         <Button onPress={() => pressRoll()} title="Roll" color="blue" disabled={endOfGame ? true : false} />
-        <View style={endOfGame ? styles.itemInvisible : styles.item}>
+        <View style={endOfGame ? styles.itemInvisible : styles.itemNav}>
           <Text style={styles.itemText}>{roll}</Text>
         </View>
-        <View style={styles.item}>
+        <View style={styles.itemNav}>
           <Text style={styles.itemText}>Score</Text>
         </View>
-        <View style={styles.item}>
+        <View style={styles.itemNav}>
           <Text style={styles.itemText}>{score}</Text>
         </View>
       </View>
@@ -316,7 +316,6 @@ const styles = StyleSheet.create({
   },
   nav: {
     flex: 0,
-    fontSize: 10,
     fontWeight: 'bold',
     flexDirection: 'row',
   },
@@ -328,6 +327,14 @@ const styles = StyleSheet.create({
     margin: 1,
     height: Dimensions.get('window').width / 15,
   },
+  itemNav: {
+    backgroundColor: 'green',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    margin: 1,
+    height: 45,
+  },
   itemBlue: {
     backgroundColor: 'blue',
   },
@@ -336,7 +343,7 @@ const styles = StyleSheet.create({
   },
   itemText: {
     color: '#fff',
-    fontSize: 10,
+    fontSize: 8,
   },
   message: {
     flex: 1,
