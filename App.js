@@ -259,7 +259,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <View style={styles.nav}>
-        <Button onPress={() => pressReset()} title="RESET" color="blue" />
+        <Button onPress={() => pressReset()} title="Reset" color="blue" />
         <View
           style={
             endOfGame
@@ -270,7 +270,7 @@ export default function App() {
           }
         >
           <TouchableHighlight onPress={() => pressEven()}>
-            <Text style={styles.itemText}>EVEN</Text>
+            <Text style={styles.itemText}>Even</Text>
           </TouchableHighlight>
         </View>
         <View
@@ -283,15 +283,15 @@ export default function App() {
           }
         >
           <TouchableHighlight onPress={() => pressOdd()}>
-            <Text style={styles.itemText}>ODD</Text>
+            <Text style={styles.itemText}>Odd</Text>
           </TouchableHighlight>
         </View>
-        <Button onPress={() => pressRoll()} title="ROLL" color="blue" disabled={endOfGame ? true : false} />
+        <Button onPress={() => pressRoll()} title="Roll" color="blue" disabled={endOfGame ? true : false} />
         <View style={endOfGame ? styles.itemInvisible : styles.item}>
           <Text style={styles.itemText}>{roll}</Text>
         </View>
         <View style={styles.item}>
-          <Text style={styles.itemText}>SCORE</Text>
+          <Text style={styles.itemText}>Score</Text>
         </View>
         <View style={styles.item}>
           <Text style={styles.itemText}>{score}</Text>
