@@ -6,13 +6,13 @@ const numColumns = 7;
 
 export default function App() {
   const [
-    { roll, even, odd, position, message, optMessage, score, board, endOfGame },
+    { roll, even, odd, position1, message, optMessage, score, board, endOfGame },
     setGameState,
   ] = useState({
     roll: 0,
     even: false,
     odd: false,
-    position: 0,
+    position1: 0,
     message: 'Roll again',
     optMessage: 'Player',
     score: 0,
@@ -58,7 +58,7 @@ export default function App() {
         </View>
       );
       // mark current spot on board
-    } else if (position === item.boardNumber && (item.invisible === undefined || item.invisible === false)) {
+    } else if (position1 === item.boardNumber && (item.invisible === undefined || item.invisible === false)) {
       return (
         <View style={[styles.item, styles.markSpot1]}>
           <Text style={styles.itemText}></Text>
@@ -80,7 +80,7 @@ export default function App() {
         roll: 0,
         even: false,
         odd: false,
-        position: 0,
+        position1: 0,
         message: 'Roll again',
         optMessage: 'Player',
         score: 0,
@@ -116,7 +116,7 @@ export default function App() {
         roll: prevGameState.roll,
         even: workEven,
         odd: prevGameState.odd,
-        position: prevGameState.position,
+        position1: prevGameState.position1,
         message: workMessage,
         optMessage: workOptMessage,
         score: prevGameState.score,
@@ -152,7 +152,7 @@ export default function App() {
         roll: prevGameState.roll,
         even: prevGameState.even,
         odd: workOdd,
-        position: prevGameState.position,
+        position1: prevGameState.position1,
         message: workMessage,
         optMessage: workOptMessage,
         score: prevGameState.score,
@@ -189,42 +189,42 @@ export default function App() {
       let filteredBoard = workBoard.filter(currentElement => {
         return currentElement.boardNumber !== undefined && currentElement.invisible !== true;
       });
-      const newPosition = Math.min(prevGameState.position + randomNumber, filteredBoard.length);
+      const newPosition1 = Math.min(prevGameState.position1 + randomNumber, filteredBoard.length);
       let i;
-      let newPositionBoard = 0;
+      let newPositionBoard1 = 0;
       for (i = 0; i < filteredBoard.length; i++) {
-        if (filteredBoard[i].boardNumber === newPosition) {
-          newPositionBoard = filteredBoard[i].key - 1;
+        if (filteredBoard[i].boardNumber === newPosition1) {
+          newPositionBoard1 = filteredBoard[i].key - 1;
         }
       }
       // Need to adjust score if 'miss a turn' or 'gain a turn' was landed on
-      if (workBoard[newPositionBoard].extraScore !== undefined) {
-        scoreAdj = scoreAdj + workBoard[newPositionBoard].extraScore;
-        if (workBoard[newPositionBoard].extraScore < 0) {
+      if (workBoard[newPositionBoard1].extraScore !== undefined) {
+        scoreAdj = scoreAdj + workBoard[newPositionBoard1].extraScore;
+        if (workBoard[newPositionBoard1].extraScore < 0) {
           workOptMessage = 'Wonderful....you get an extra roll';
         } else {
           workOptMessage = 'Sorry....you lose a roll';
         }
       }
       // Add the detour squares and remove a single square after detour
-      if (workBoard[newPositionBoard].itemsToAdd !== undefined) {
+      if (workBoard[newPositionBoard1].itemsToAdd !== undefined) {
         let workBoard2 = workBoard.slice();
         let i;
         for (i = 0; i < workBoard2.length; i++) {
           if (workBoard2[i].addItem !== undefined) {
-            if (workBoard2[newPositionBoard].itemsToAdd === workBoard2[i].addItem) {
+            if (workBoard2[newPositionBoard1].itemsToAdd === workBoard2[i].addItem) {
               workBoard2[i].invisible = false;
-              workBoard2[i].boardNumber = workBoard2[i].boardNumber + newPosition;
+              workBoard2[i].boardNumber = workBoard2[i].boardNumber + newPosition1;
             }
           }
           if (workBoard2[i].deleteItem !== undefined) {
-            if (workBoard2[newPositionBoard].itemsToAdd === workBoard2[i].deleteItem) {
+            if (workBoard2[newPositionBoard1].itemsToAdd === workBoard2[i].deleteItem) {
               workBoard2[i].invisible = true;
             }
           }
           if (workBoard2[i].boardNumber !== undefined) {
             if (
-              workBoard2[i].boardNumber > newPosition &&
+              workBoard2[i].boardNumber > newPosition1 &&
               workBoard2[i].invisible === undefined &&
               workBoard2[i].addItem === undefined
             ) {
@@ -236,7 +236,7 @@ export default function App() {
         workOptMessage = 'You have a longer journey';
       }
       // Check for end of Game
-      if (newPosition >= filteredBoard.length) {
+      if (newPosition1 >= filteredBoard.length) {
         workMessage = 'Game Complete';
         workOptMessage = 'Player';
         workEndOfGame = true;
@@ -245,7 +245,7 @@ export default function App() {
         roll: randomNumber,
         even: false,
         odd: false,
-        position: newPosition,
+        position1: newPosition1,
         message: workMessage,
         optMessage: workOptMessage,
         score: prevGameState.score + scoreAdj,
