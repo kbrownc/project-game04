@@ -6,7 +6,7 @@ const numColumns = 7;
 
 export default function App() {
   const [
-    { roll, even, odd, position1, message, optMessage, score, board, endOfGame },
+    { roll, even, odd, position1, message, optMessage, score, board, endOfGame, about },
     setGameState,
   ] = useState({
     roll: 0,
@@ -18,53 +18,26 @@ export default function App() {
     score: 0,
     board: JSON.parse(JSON.stringify(newBoard)),
     endOfGame: false,
+    about: true,
   });
 
   // render board
   const renderBoard = ({ item }) => {
-    const rollNumberKey = 11;
-    if (item.invisible === true) {
+    // Create About page
+    if (about && item.aboutText !== undefined) {
+      return <Text style={styles.itemAbout}>{item.aboutText}</Text>;
+    // Make non-board squares invisible
+    } else if (item.invisible === true) {
       return <View style={[styles.item, styles.itemInvisible]} />;
-      // Show ROLL button
-    } else if (item.name === 'ROLL') {
-      return (
-        <View style={styles.item}>
-          <TouchableHighlight onPress={() => pressRoll()}>
-            <Text style={styles.itemText}>{item.name}</Text>
-          </TouchableHighlight>
-        </View>
-      );
-      // Create Even or Odd button and mark it if it has been selected
-    } else if (item.name === 'EVEN' || item.name === 'ODD') {
-      const onPress = item.name === 'EVEN' ? pressEven : pressOdd;
-      return (
-        <View
-          style={
-            (item.name === 'EVEN' && even) || (item.name === 'ODD' && odd)
-              ? [styles.item, styles.markSpot1]
-              : styles.item
-          }
-        >
-          <TouchableHighlight onPress={onPress}>
-            <Text style={styles.itemText}>{item.name}</Text>
-          </TouchableHighlight>
-        </View>
-      );
-      // Show ROLL NUMBER
-    } else if (item.key === rollNumberKey) {
-      return (
-        <View style={styles.item}>
-          <Text style={styles.itemText}>{roll}</Text>
-        </View>
-      );
-      // mark current spot on board
+    // mark current spot on board
     } else if (position1 === item.boardNumber && (item.invisible === undefined || item.invisible === false)) {
       return (
         <View style={[styles.item, styles.markSpot1]}>
           <Text style={styles.itemText}></Text>
         </View>
       );
-    } else {
+    // mark board squares
+    } else if (about === false) {
       return (
         <View style={styles.item}>
           <Text style={styles.itemText}>{item.name}</Text>
@@ -86,6 +59,7 @@ export default function App() {
         score: 0,
         board: JSON.parse(JSON.stringify(newBoard)),
         endOfGame: false,
+        about: false,
       };
     });
   }, []);
@@ -122,6 +96,7 @@ export default function App() {
         score: prevGameState.score,
         board: prevGameState.board,
         endOfGame: prevGameState.endOfGame,
+        about: prevGameState.about,
       };
     });
   }, []);
@@ -158,6 +133,7 @@ export default function App() {
         score: prevGameState.score,
         board: prevGameState.board,
         endOfGame: prevGameState.endOfGame,
+        about: prevGameState.about,
       };
     });
   }, []);
@@ -251,6 +227,7 @@ export default function App() {
         score: prevGameState.score + scoreAdj,
         board: workBoard,
         endOfGame: workEndOfGame,
+        about: false,
       };
     });
   }, []);
@@ -324,6 +301,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
+    margin: 1,
+    height: Dimensions.get('window').width / 15,
+  },
+  itemAbout: {
+    backgroundColor: 'white',
+    fontWeight: 'bold',
+    color: 'black',
+    alignItems: 'center',
+    justifyContent: 'center',
     margin: 1,
     height: Dimensions.get('window').width / 15,
   },
