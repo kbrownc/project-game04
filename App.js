@@ -13,7 +13,7 @@ export default function App() {
     even: false,
     odd: false,
     position1: 0,
-    message: 'Roll again',
+    message: 'Roll to Start',
     optMessage: 'Player',
     score: 0,
     board: JSON.parse(JSON.stringify(newBoard)),
