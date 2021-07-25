@@ -25,18 +25,18 @@ export default function App() {
   const renderBoard = ({ item }) => {
     // Create About page
     if (about && item.aboutText !== undefined) {
-      return <Text style={styles.itemAbout}>{item.aboutText}</Text>;
-    // Make non-board squares invisible
+      return <Text style={styles.itemAbout}>{item.aboutText}</Text>
+      // Make non-board squares invisible
     } else if (item.invisible === true) {
       return <View style={[styles.item, styles.itemInvisible]} />;
-    // mark current spot on board
+      // mark current spot on board
     } else if (position1 === item.boardNumber && (item.invisible === undefined || item.invisible === false)) {
       return (
         <View style={[styles.item, styles.markSpot1]}>
           <Text style={styles.itemText}></Text>
         </View>
       );
-    // mark board squares
+      // mark board squares
     } else if (about === false) {
       return (
         <View style={styles.item}>
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     color: 'black',
     alignItems: 'center',
     justifyContent: 'center',
-    margin: 1,
+    marginLeft: 10,
     height: Dimensions.get('window').width / 15,
   },
   itemNav: {
