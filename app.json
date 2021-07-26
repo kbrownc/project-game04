@@ -23,10 +23,12 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.kbrownc.projectgame04"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "description": "The U-game."
   }
 }
