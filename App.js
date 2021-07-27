@@ -6,13 +6,14 @@ const numColumns = 7;
 
 export default function App() {
   const [
-    { roll, even, odd, position1, message, optMessage, score, board, endOfGame, about },
+    { roll, even, odd, position1, position2, message, optMessage, score, board, endOfGame, about },
     setGameState,
   ] = useState({
     roll: 0,
     even: false,
     odd: false,
     position1: 0,
+    position2: 0,
     message: 'Roll to Start',
     optMessage: 'Player',
     score: 0,
@@ -54,6 +55,7 @@ export default function App() {
         even: false,
         odd: false,
         position1: 0,
+        position2: 0,
         message: 'Roll again',
         optMessage: 'Player',
         score: 0,
@@ -91,6 +93,7 @@ export default function App() {
         even: workEven,
         odd: prevGameState.odd,
         position1: prevGameState.position1,
+        position2: prevGameState.position2,
         message: workMessage,
         optMessage: workOptMessage,
         score: prevGameState.score,
@@ -128,6 +131,7 @@ export default function App() {
         even: prevGameState.even,
         odd: workOdd,
         position1: prevGameState.position1,
+        position2: prevGameState.position2,
         message: workMessage,
         optMessage: workOptMessage,
         score: prevGameState.score,
@@ -222,6 +226,7 @@ export default function App() {
         even: false,
         odd: false,
         position1: newPosition1,
+        position2: 0,
         message: workMessage,
         optMessage: workOptMessage,
         score: prevGameState.score + scoreAdj,
