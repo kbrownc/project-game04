@@ -6,7 +6,20 @@ const numColumns = 7;
 
 export default function App() {
   const [
-    { roll, even, odd, position1, position2, message, optMessage, score, board, endOfGame, about },
+    {
+      roll,
+      even,
+      odd,
+      position1,
+      position2,
+      message,
+      optMessage,
+      score,
+      board,
+      endOfGame,
+      about,
+      numberOfPlayers,
+    },
     setGameState,
   ] = useState({
     roll: 0,
@@ -14,19 +27,20 @@ export default function App() {
     odd: false,
     position1: 0,
     position2: 0,
-    message: 'Roll to Start',
-    optMessage: 'Player',
+    message: '1-Player Game',
+    optMessage: '2-Player Game',
     score: 0,
     board: JSON.parse(JSON.stringify(newBoard)),
     endOfGame: false,
     about: true,
+    numberOfPlayers: 0,
   });
 
   // render board
   const renderBoard = ({ item }) => {
     // Create About page
     if (about && item.aboutText !== undefined) {
-      return <Text style={styles.itemAbout}>{item.aboutText}</Text>
+      return <Text style={styles.itemAbout}>{item.aboutText}</Text>;
       // Make non-board squares invisible
     } else if (item.invisible === true) {
       return <View style={[styles.item, styles.itemInvisible]} />;
@@ -49,19 +63,79 @@ export default function App() {
 
   // press Reset button
   const pressReset = useCallback(() => {
-    setGameState(() => {
+    setGameState(prevGameState => {
+      let workNumberOfPlayers = prevGameState.numberOfPlayers;
+      let workMessage = prevGameState.message;
+      let workOptMessage = prevGameState.optMessage;
+      if (workNumberOfPlayers === 1 && prevGameState.position1 === 0) {
+        workNumberOfPlayers = 0;
+        workMessage = '1-player Game';
+        workOptMessage = '2-player Game';
+      }
+      if (workNumberOfPlayers === 2 && prevGameState.position1 === 0 && prevGameState.position2 === 0) {
+        workNumberOfPlayers = 0;
+        workMessage = '1-player Game';
+        workOptMessage = '2-player Game';
+      }
       return {
         roll: 0,
         even: false,
         odd: false,
         position1: 0,
         position2: 0,
-        message: 'Roll again',
-        optMessage: 'Player',
+        message: workMessage,
+        optMessage: workOptMessage,
         score: 0,
         board: JSON.parse(JSON.stringify(newBoard)),
         endOfGame: false,
+        about: prevGameState.about,
+        numberOfPlayers: workNumberOfPlayers,
+      };
+    });
+  }, []);
+
+  // pressed 1-Player button
+  const pressPlayers1 = useCallback(() => {
+    setGameState(prevGameState => {
+      let workNumberOfPlayers = 1;
+      let workMessage = 'Roll again';
+      let workOptMessage = 'Player 1';
+      return {
+        roll: prevGameState.roll,
+        even: prevGameState.even,
+        odd: prevGameState.odd,
+        position1: prevGameState.position1,
+        position2: prevGameState.position2,
+        message: workMessage,
+        optMessage: workOptMessage,
+        score: prevGameState.score,
+        board: prevGameState.board,
+        endOfGame: prevGameState.endOfGame,
         about: false,
+        numberOfPlayers: workNumberOfPlayers,
+      };
+    });
+  }, []);
+
+  // pressed 2-Player button
+  const pressPlayers2 = useCallback(() => {
+    setGameState(prevGameState => {
+      let workNumberOfPlayers = 2;
+      let workMessage = 'Roll again';
+      let workOptMessage = 'Player 1';
+      return {
+        roll: prevGameState.roll,
+        even: prevGameState.even,
+        odd: prevGameState.odd,
+        position1: prevGameState.position1,
+        position2: prevGameState.position2,
+        message: workMessage,
+        optMessage: workOptMessage,
+        score: prevGameState.score,
+        board: prevGameState.board,
+        endOfGame: prevGameState.endOfGame,
+        about: false,
+        numberOfPlayers: workNumberOfPlayers,
       };
     });
   }, []);
@@ -100,6 +174,7 @@ export default function App() {
         board: prevGameState.board,
         endOfGame: prevGameState.endOfGame,
         about: prevGameState.about,
+        numberOfPlayers: prevGameState.numberOfPlayers,
       };
     });
   }, []);
@@ -138,6 +213,7 @@ export default function App() {
         board: prevGameState.board,
         endOfGame: prevGameState.endOfGame,
         about: prevGameState.about,
+        numberOfPlayers: prevGameState.numberOfPlayers,
       };
     });
   }, []);
@@ -233,6 +309,7 @@ export default function App() {
         board: workBoard,
         endOfGame: workEndOfGame,
         about: false,
+        numberOfPlayers: prevGameState.numberOfPlayers,
       };
     });
   }, []);
@@ -241,10 +318,15 @@ export default function App() {
   return (
     <View style={styles.container}>
       <View style={styles.nav}>
-        <Button onPress={() => pressReset()} title="Reset" color="blue" />
+        <Button
+          onPress={() => pressReset()}
+          title="Reset"
+          color="blue"
+          disabled={numberOfPlayers === 0 ? true : false}
+        />
         <View
           style={
-            endOfGame
+            endOfGame || numberOfPlayers === 0
               ? styles.itemInvisible
               : even
               ? [styles.item, styles.markSpot1]
@@ -257,7 +339,7 @@ export default function App() {
         </View>
         <View
           style={
-            endOfGame
+            endOfGame || numberOfPlayers === 0
               ? styles.itemInvisible
               : odd
               ? [styles.item, styles.markSpot1]
@@ -268,20 +350,41 @@ export default function App() {
             <Text style={styles.itemText}>Odd</Text>
           </TouchableHighlight>
         </View>
-        <Button onPress={() => pressRoll()} title="Roll" color="blue" disabled={endOfGame ? true : false} />
-        <View style={endOfGame ? styles.itemInvisible : styles.itemNav}>
+        <View style={endOfGame || numberOfPlayers === 0 ? styles.itemInvisible : null}>
+          <Button
+            onPress={() => pressRoll()}
+            title="Roll"
+            color="blue"
+            disabled={endOfGame || numberOfPlayers === 0 ? true : false}
+          />
+        </View>
+        <View style={endOfGame || numberOfPlayers === 0 ? styles.itemInvisible : styles.itemNav}>
           <Text style={styles.itemText}>{roll}</Text>
         </View>
-        <View style={styles.itemNav}>
+        <View style={numberOfPlayers === 1 ? styles.itemNav : styles.itemInvisible}>
           <Text style={styles.itemText}>Score</Text>
         </View>
-        <View style={styles.itemNav}>
+        <View style={numberOfPlayers === 1 ? styles.itemNav : styles.itemInvisible}>
           <Text style={styles.itemText}>{score}</Text>
         </View>
       </View>
       <View style={styles.message}>
-        <Text style={styles.message}>{message}</Text>
-        <Text style={styles.message}>{optMessage}</Text>
+        <View style={styles.messageRow}>
+          <Text style={styles.message}>{message}</Text>
+          <View style={numberOfPlayers !== 0 ? styles.itemInvisible : styles.messageRow}>
+            <TouchableHighlight onPress={() => pressPlayers1()}>
+              <Text style={styles.messageRow2}>Select</Text>
+            </TouchableHighlight>
+          </View>
+        </View>
+        <View style={styles.messageRow}>
+          <Text style={styles.message}>{optMessage}</Text>
+          <View style={numberOfPlayers !== 0 ? styles.itemInvisible : styles.messageRow}>
+            <TouchableHighlight onPress={() => pressPlayers2()}>
+              <Text style={styles.messageRow2}>Select</Text>
+            </TouchableHighlight>
+          </View>
+        </View>
       </View>
       <View style={styles.board}>
         <FlatList data={board} renderItem={renderBoard} style={styles.board} numColumns={numColumns} />
@@ -344,6 +447,25 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  messageRow: {
+    flex: 1,
+    justifyContent: 'center',
+    flexDirection: 'row',
+    color: 'black',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  messageRow2: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    flexDirection: 'row',
+    color: 'black',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    borderWidth: 2,
   },
   board: {
     flex: 7,
