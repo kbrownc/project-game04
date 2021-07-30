@@ -19,6 +19,7 @@ export default function App() {
       endOfGame,
       about,
       numberOfPlayers,
+      whoseTurn,
     },
     setGameState,
   ] = useState({
@@ -34,6 +35,7 @@ export default function App() {
     endOfGame: false,
     about: true,
     numberOfPlayers: 0,
+    whoseTurn: 0,
   });
 
   // render board
@@ -44,10 +46,16 @@ export default function App() {
       // Make non-board squares invisible
     } else if (item.invisible === true) {
       return <View style={[styles.item, styles.itemInvisible]} />;
-      // mark current spot on board
+      // mark current spot(s) on board
     } else if (position1 === item.boardNumber && (item.invisible === undefined || item.invisible === false)) {
       return (
         <View style={[styles.item, styles.markSpot1]}>
+          <Text style={styles.itemText}></Text>
+        </View>
+      );
+    } else if (position2 === item.boardNumber && (item.invisible === undefined || item.invisible === false)) {
+      return (
+        <View style={[styles.item, styles.markSpot2]}>
           <Text style={styles.itemText}></Text>
         </View>
       );
@@ -67,15 +75,18 @@ export default function App() {
       let workNumberOfPlayers = prevGameState.numberOfPlayers;
       let workMessage = prevGameState.message;
       let workOptMessage = prevGameState.optMessage;
+      let workWhoseTurn = 1;
       if (workNumberOfPlayers === 1 && prevGameState.position1 === 0) {
         workNumberOfPlayers = 0;
         workMessage = '1-player Game';
         workOptMessage = '2-player Game';
+        workWhoseTurn = 0;
       }
       if (workNumberOfPlayers === 2 && prevGameState.position1 === 0 && prevGameState.position2 === 0) {
         workNumberOfPlayers = 0;
         workMessage = '1-player Game';
         workOptMessage = '2-player Game';
+        workWhoseTurn = 0;
       }
       return {
         roll: 0,
@@ -90,6 +101,7 @@ export default function App() {
         endOfGame: false,
         about: prevGameState.about,
         numberOfPlayers: workNumberOfPlayers,
+        whoseTurn: workWhoseTurn,
       };
     });
   }, []);
@@ -113,6 +125,7 @@ export default function App() {
         endOfGame: prevGameState.endOfGame,
         about: false,
         numberOfPlayers: workNumberOfPlayers,
+        whoseTurn: 1,
       };
     });
   }, []);
@@ -136,6 +149,7 @@ export default function App() {
         endOfGame: prevGameState.endOfGame,
         about: false,
         numberOfPlayers: workNumberOfPlayers,
+        whoseTurn: 1,
       };
     });
   }, []);
@@ -175,6 +189,7 @@ export default function App() {
         endOfGame: prevGameState.endOfGame,
         about: prevGameState.about,
         numberOfPlayers: prevGameState.numberOfPlayers,
+        whoseTurn: prevGameState.whoseTurn,
       };
     });
   }, []);
@@ -214,6 +229,7 @@ export default function App() {
         endOfGame: prevGameState.endOfGame,
         about: prevGameState.about,
         numberOfPlayers: prevGameState.numberOfPlayers,
+        whoseTurn: prevGameState.whoseTurn,
       };
     });
   }, []);
@@ -226,6 +242,14 @@ export default function App() {
       let scoreAdj = 1;
       let workMessage = 'Roll again';
       let workOptMessage = 'Player';
+      let workWhoseTurn = prevGameState.whoseTurn;
+      if (workWhoseTurn === 1 && prevGameState.numberOfPlayers === 2) {
+        workWhoseTurn = 2;
+        workOptMessage = 'Player 2';
+      } else {
+        workWhoseTurn = 1;
+        workOptMessage = 'Player 1';
+      }
       let workEndOfGame = false;
       if (randomNumber % 2 === 1 && prevGameState.odd === true) {
         randomNumber = randomNumber * 2;
@@ -241,25 +265,46 @@ export default function App() {
         workMessage = 'Woops...roll set to 0';
       }
       // calculate location in array that matches current boardNumber
-      //let filteredBoard = workBoard.map((currentElement, index) => ({ ...currentElement, key1: index })).filter((currentElement) => {
       let filteredBoard = workBoard.filter(currentElement => {
         return currentElement.boardNumber !== undefined && currentElement.invisible !== true;
       });
-      const newPosition1 = Math.min(prevGameState.position1 + randomNumber, filteredBoard.length);
+      let newPosition1 = prevGameState.position1;
+      let newPosition2 = prevGameState.position2;
+      if (prevGameState.whoseTurn === 1 || numberOfPlayers === 1) {
+        newPosition1 = Math.min(prevGameState.position1 + randomNumber, filteredBoard.length);
+      } else {
+        newPosition2 = Math.min(prevGameState.position2 + randomNumber, filteredBoard.length);
+      }
       let i;
       let newPositionBoard1 = 0;
+      let newPositionBoard2 = 0;
       for (i = 0; i < filteredBoard.length; i++) {
         if (filteredBoard[i].boardNumber === newPosition1) {
           newPositionBoard1 = filteredBoard[i].key - 1;
+        }
+        if (filteredBoard[i].boardNumber === newPosition2) {
+          newPositionBoard2 = filteredBoard[i].key - 1;
         }
       }
       // Need to adjust score if 'miss a turn' or 'gain a turn' was landed on
       if (workBoard[newPositionBoard1].extraScore !== undefined) {
         scoreAdj = scoreAdj + workBoard[newPositionBoard1].extraScore;
         if (workBoard[newPositionBoard1].extraScore < 0) {
-          workOptMessage = 'Wonderful....you get an extra roll';
+          if (workWhoseTurn === 1 && prevGameState.numberOfPlayers === 2) {
+            workWhoseTurn = 2;
+            workOptMessage = 'Wonderful....you get an extra roll Player 2';
+          } else {
+            workWhoseTurn = 1;
+            workOptMessage = 'Wonderful....you get an extra roll Player 1';
+          }
         } else {
-          workOptMessage = 'Sorry....you lose a roll';
+          if (workWhoseTurn === 1 && prevGameState.numberOfPlayers === 2) {
+            workWhoseTurn = 2;
+            workOptMessage = 'Sorry....you lose a roll Player 2';
+          } else {
+            workWhoseTurn = 1;
+            workOptMessage = 'Sorry....you lose a roll Player 1';
+          }
         }
       }
       // Add the detour squares and remove a single square after detour
@@ -294,7 +339,12 @@ export default function App() {
       // Check for end of Game
       if (newPosition1 >= filteredBoard.length) {
         workMessage = 'Game Complete';
-        workOptMessage = 'Player';
+        workOptMessage = 'Player 1 wins';
+        workEndOfGame = true;
+      }
+      if (newPosition2 >= filteredBoard.length) {
+        workMessage = 'Game Complete';
+        workOptMessage = 'Player 2 wins';
         workEndOfGame = true;
       }
       return {
@@ -302,7 +352,7 @@ export default function App() {
         even: false,
         odd: false,
         position1: newPosition1,
-        position2: 0,
+        position2: newPosition2,
         message: workMessage,
         optMessage: workOptMessage,
         score: prevGameState.score + scoreAdj,
@@ -310,6 +360,7 @@ export default function App() {
         endOfGame: workEndOfGame,
         about: false,
         numberOfPlayers: prevGameState.numberOfPlayers,
+        whoseTurn: workWhoseTurn,
       };
     });
   }, []);
@@ -465,7 +516,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
-    borderWidth: 2,
+    backgroundColor: 'yellow',
   },
   board: {
     flex: 7,
