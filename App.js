@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { StyleSheet, Text, View, FlatList, Dimensions, TouchableHighlight, Button } from 'react-native';
+import { StyleSheet, Text, View, FlatList, Dimensions, TouchableHighlight, Button, Image } from 'react-native';
 import { newBoard } from './newboard.js';
 
 const numColumns = 7;
@@ -43,23 +43,30 @@ export default function App() {
     // Create About page
     if (about && item.aboutText !== undefined) {
       return <Text style={styles.itemAbout}>{item.aboutText}</Text>;
-      // Make non-board squares invisible
+    // Make non-board squares invisible
     } else if (item.invisible === true) {
       return <View style={[styles.item, styles.itemInvisible]} />;
-      // mark current spot(s) on board
+    // mark current spot(s) on board
+    } else if (position1 === item.boardNumber && position2 === item.boardNumber && 
+                (item.invisible === undefined || item.invisible === false)) {
+      return (
+        <View style={[styles.item, styles.markSpot]}>
+          <Image source={require('./assets/player-3.png')} />
+        </View>
+      );
     } else if (position1 === item.boardNumber && (item.invisible === undefined || item.invisible === false)) {
       return (
-        <View style={[styles.item, styles.markSpot1]}>
-          <Text style={styles.itemText}></Text>
+        <View style={[styles.item, styles.markSpot]}>
+          <Image source={require('./assets/player-1.png')} />
         </View>
       );
     } else if (position2 === item.boardNumber && (item.invisible === undefined || item.invisible === false)) {
       return (
-        <View style={[styles.item, styles.markSpot2]}>
-          <Text style={styles.itemText}></Text>
+        <View style={[styles.item, styles.markSpot]}>
+          <Image source={require('./assets/player-2.png')} />
         </View>
       );
-      // mark board squares
+    // mark board squares
     } else if (about === false) {
       return (
         <View style={styles.item}>
@@ -75,18 +82,21 @@ export default function App() {
       let workNumberOfPlayers = prevGameState.numberOfPlayers;
       let workMessage = prevGameState.message;
       let workOptMessage = prevGameState.optMessage;
+      let workAbout = prevGameState.about;
       let workWhoseTurn = 1;
       if (workNumberOfPlayers === 1 && prevGameState.position1 === 0) {
         workNumberOfPlayers = 0;
         workMessage = '1-player Game';
         workOptMessage = '2-player Game';
         workWhoseTurn = 0;
+        workAbout = true;
       }
       if (workNumberOfPlayers === 2 && prevGameState.position1 === 0 && prevGameState.position2 === 0) {
         workNumberOfPlayers = 0;
         workMessage = '1-player Game';
         workOptMessage = '2-player Game';
         workWhoseTurn = 0;
+        workAbout = true;
       }
       return {
         roll: 0,
@@ -99,7 +109,7 @@ export default function App() {
         score: 0,
         board: JSON.parse(JSON.stringify(newBoard)),
         endOfGame: false,
-        about: prevGameState.about,
+        about: workAbout,
         numberOfPlayers: workNumberOfPlayers,
         whoseTurn: workWhoseTurn,
       };
@@ -159,7 +169,6 @@ export default function App() {
     setGameState(prevGameState => {
       let workEven;
       let workMessage = 'Roll again';
-      let workOptMessage = 'Player';
       if (prevGameState.even === true) {
         workEven = false;
       } else {
@@ -169,12 +178,11 @@ export default function App() {
         workEven = false;
       }
       if (workEven === false && prevGameState.odd === true) {
-        workMessage = 'Roll again';
-        workOptMessage = 'ODD selected';
+        workMessage = 'Roll again (ODD only)';
       }
       if (prevGameState.odd === false && workEven === true) {
-        workMessage = 'Roll again';
-        workOptMessage = 'EVEN selected';
+        workMessage = 'Roll again (EVEN only)';
+        
       }
       return {
         roll: prevGameState.roll,
@@ -183,7 +191,7 @@ export default function App() {
         position1: prevGameState.position1,
         position2: prevGameState.position2,
         message: workMessage,
-        optMessage: workOptMessage,
+        optMessage: prevGameState.optMessage,
         score: prevGameState.score,
         board: prevGameState.board,
         endOfGame: prevGameState.endOfGame,
@@ -199,7 +207,6 @@ export default function App() {
     setGameState(prevGameState => {
       let workOdd;
       let workMessage = 'Roll again';
-      let workOptMessage = 'Player';
       if (prevGameState.odd === true) {
         workOdd = false;
       } else {
@@ -209,12 +216,10 @@ export default function App() {
         workOdd = false;
       }
       if (workOdd === true && prevGameState.even === false) {
-        workMessage = 'Roll again';
-        workOptMessage = 'ODD selected';
+        workMessage = 'Roll again (ODD only)';
       }
       if (workOdd === false && prevGameState.even === true) {
-        workMessage = 'Roll again';
-        workOptMessage = 'EVEN selected';
+        workMessage = 'Roll again (EVEN only)';
       }
       return {
         roll: prevGameState.roll,
@@ -223,7 +228,7 @@ export default function App() {
         position1: prevGameState.position1,
         position2: prevGameState.position2,
         message: workMessage,
-        optMessage: workOptMessage,
+        optMessage: prevGameState.optMessage,
         score: prevGameState.score,
         board: prevGameState.board,
         endOfGame: prevGameState.endOfGame,
@@ -292,18 +297,18 @@ export default function App() {
         if (workBoard[newPositionBoard1].extraScore < 0) {
           if (workWhoseTurn === 1 && prevGameState.numberOfPlayers === 2) {
             workWhoseTurn = 2;
-            workOptMessage = 'Wonderful....you get an extra roll Player 2';
+            workMessage = 'Roll (extra roll)';
           } else {
             workWhoseTurn = 1;
-            workOptMessage = 'Wonderful....you get an extra roll Player 1';
+            workMessage = 'Roll (extra roll)';
           }
         } else {
           if (workWhoseTurn === 1 && prevGameState.numberOfPlayers === 2) {
             workWhoseTurn = 2;
-            workOptMessage = 'Sorry....you lose a roll Player 2';
+            workMessage = 'Roll (lose a roll)';
           } else {
             workWhoseTurn = 1;
-            workOptMessage = 'Sorry....you lose a roll Player 1';
+            workMessage = 'Roll (lose a roll)';
           }
         }
       }
@@ -312,17 +317,20 @@ export default function App() {
         let workBoard2 = workBoard.slice();
         let i;
         for (i = 0; i < workBoard2.length; i++) {
+          // Set detour to be visible
           if (workBoard2[i].addItem !== undefined) {
             if (workBoard2[newPositionBoard1].itemsToAdd === workBoard2[i].addItem) {
               workBoard2[i].invisible = false;
               workBoard2[i].boardNumber = workBoard2[i].boardNumber + newPosition1;
             }
           }
+          // Set square in middle of detour to be invisible
           if (workBoard2[i].deleteItem !== undefined) {
             if (workBoard2[newPositionBoard1].itemsToAdd === workBoard2[i].deleteItem) {
               workBoard2[i].invisible = true;
             }
           }
+          // Increment all board squares beyond this detour by 6
           if (workBoard2[i].boardNumber !== undefined) {
             if (
               workBoard2[i].boardNumber > newPosition1 &&
@@ -334,7 +342,7 @@ export default function App() {
           }
         }
         workBoard = workBoard2.slice();
-        workOptMessage = 'You have a longer journey';
+        workMessage = 'Roll (longer journey)';
       }
       // Check for end of Game
       if (newPosition1 >= filteredBoard.length) {
@@ -380,7 +388,7 @@ export default function App() {
             endOfGame || numberOfPlayers === 0
               ? styles.itemInvisible
               : even
-              ? [styles.item, styles.markSpot1]
+              ? [styles.item, styles.markSpotRed]
               : [styles.item, styles.itemBlue]
           }
         >
@@ -393,7 +401,7 @@ export default function App() {
             endOfGame || numberOfPlayers === 0
               ? styles.itemInvisible
               : odd
-              ? [styles.item, styles.markSpot1]
+              ? [styles.item, styles.markSpotRed]
               : [styles.item, styles.itemBlue]
           }
         >
@@ -524,10 +532,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginVertical: 1,
   },
-  markSpot1: {
-    backgroundColor: 'red',
+  markSpot: {
+    backgroundColor: 'white',
+    borderWidth: 1,
   },
-  markSpot2: {
-    backgroundColor: 'black',
+  markSpotRed: {
+    backgroundColor: 'red',
   },
 });
