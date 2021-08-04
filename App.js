@@ -255,7 +255,7 @@ export default function App() {
         workWhoseTurn = 1;
         workOptMessage = 'Player 1';
       }
-      let workEndOfGame = false;
+      // Is workmessage obsolete code ????????
       if (randomNumber % 2 === 1 && prevGameState.odd === true) {
         randomNumber = randomNumber * 2;
         workMessage = 'Great...roll doubled';
@@ -314,37 +314,88 @@ export default function App() {
       }
       // Add the detour squares and remove a single square after detour
       if (workBoard[newPositionBoard1].itemsToAdd !== undefined) {
-        let workBoard2 = workBoard.slice();
-        let i;
-        for (i = 0; i < workBoard2.length; i++) {
-          // Set detour to be visible
-          if (workBoard2[i].addItem !== undefined) {
-            if (workBoard2[newPositionBoard1].itemsToAdd === workBoard2[i].addItem) {
-              workBoard2[i].invisible = false;
-              workBoard2[i].boardNumber = workBoard2[i].boardNumber + newPosition1;
+        // Player 1 landed on detour spot
+        if (prevGameState.whoseTurn === 1) {
+          let workBoard2 = workBoard.slice();
+          let notAlreadyDeleted = false;
+          let i;
+          for (i = 0; i < workBoard2.length; i++) {
+            // Set detour to be visible
+            if (workBoard2[i].addItem !== undefined) {
+              if (workBoard2[newPositionBoard1].itemsToAdd === workBoard2[i].addItem) {
+                workBoard2[i].invisible = false;
+                workBoard2[i].boardNumber = workBoard2[i].boardNumber + newPosition1;
+              }
+            }
+            // Set square in middle of detour to be invisible
+            if (workBoard2[i].deleteItem !== undefined) {
+              if (workBoard2[newPositionBoard1].itemsToAdd === workBoard2[i].deleteItem) {
+                if (workBoard2[i].invisible === true) {
+                  notAlreadyDeleted = true;
+                }
+                workBoard2[i].invisible = true;
+              }
+            }
+            // Increment all board squares beyond this detour by 6
+            if (workBoard2[i].boardNumber !== undefined) {
+              if (
+                workBoard2[i].boardNumber > newPosition1 &&
+                workBoard2[i].invisible === undefined &&
+                workBoard2[i].addItem === undefined
+              ) {
+                workBoard2[i].boardNumber = workBoard2[i].boardNumber + 6;
+              }
             }
           }
-          // Set square in middle of detour to be invisible
-          if (workBoard2[i].deleteItem !== undefined) {
-            if (workBoard2[newPositionBoard1].itemsToAdd === workBoard2[i].deleteItem) {
-              workBoard2[i].invisible = true;
+          // Adjust for situation where the other player is already past detour
+          if (prevGameState.numberOfPlayers = 2 && prevGameState.position2 > newPosition1 && notAlreadyDeleted ) {
+            newPosition2 = newPosition2 + 6;
+          }
+          workBoard = workBoard2.slice();
+          workMessage = 'Roll (longer journey)';
+        // Player 2 landed on detour spot
+        } else {
+          let workBoard2 = workBoard.slice();
+          let notAlreadyDeleted = false;
+          let i;
+          for (i = 0; i < workBoard2.length; i++) {
+            // Set detour to be visible
+            if (workBoard2[i].addItem !== undefined) {
+              if (workBoard2[newPositionBoard2].itemsToAdd === workBoard2[i].addItem) {
+                workBoard2[i].invisible = false;
+                workBoard2[i].boardNumber = workBoard2[i].boardNumber + newPosition2;
+              }
+            }
+            // Set square in middle of detour to be invisible
+            if (workBoard2[i].deleteItem !== undefined) {
+              if (workBoard2[newPositionBoard2].itemsToAdd === workBoard2[i].deleteItem) {
+                if (workBoard2[i].invisible === true) {
+                  notAlreadyDeleted = true;
+                }
+                workBoard2[i].invisible = true;
+              }
+            }
+            // Increment all board squares beyond this detour by 6
+            if (workBoard2[i].boardNumber !== undefined) {
+              if (
+                workBoard2[i].boardNumber > newPosition2 &&
+                workBoard2[i].invisible === undefined &&
+                workBoard2[i].addItem === undefined
+              ) {
+                workBoard2[i].boardNumber = workBoard2[i].boardNumber + 6;
+              }
             }
           }
-          // Increment all board squares beyond this detour by 6
-          if (workBoard2[i].boardNumber !== undefined) {
-            if (
-              workBoard2[i].boardNumber > newPosition1 &&
-              workBoard2[i].invisible === undefined &&
-              workBoard2[i].addItem === undefined
-            ) {
-              workBoard2[i].boardNumber = workBoard2[i].boardNumber + 6;
-            }
+          // Adjust for situation where the other player is already past detour
+          if (prevGameState.numberOfPlayers = 2 && prevGameState.position1 > newPosition2 && notAlreadyDeleted) {
+            newPosition1 = newPosition1 + 6;
           }
+          workBoard = workBoard2.slice();
+          workMessage = 'Roll (longer journey)';
         }
-        workBoard = workBoard2.slice();
-        workMessage = 'Roll (longer journey)';
       }
       // Check for end of Game
+      let workEndOfGame = false;
       if (newPosition1 >= filteredBoard.length) {
         workMessage = 'Game Complete';
         workOptMessage = 'Player 1 wins';
