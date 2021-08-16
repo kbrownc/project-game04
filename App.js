@@ -255,13 +255,14 @@ export default function App() {
     setGameState(prevGameState => {
       let workBoard = prevGameState.board.slice();
       let randomNumber = Math.floor(Math.random() * 6) + 1;
-      randomNumber = 3;
       // Why did I need to add this line?
       let workNumberOfPlayers = prevGameState.numberOfPlayers;
       let scoreAdj = 1;
       let workMessage = 'Roll again';
       let workOptMessage = 'Player';
       let workWhoseTurn = prevGameState.whoseTurn;
+      // Testing line
+      if (workWhoseTurn === 1) {randomNumber = 1} else {randomNumber = 2};
       if (workWhoseTurn === 1 && prevGameState.numberOfPlayers === 2) {
         workWhoseTurn = 2;
         workOptMessage = 'Player 2';
@@ -309,20 +310,24 @@ export default function App() {
       if (workBoard[newPositionBoard1].extraScore !== undefined) {
         scoreAdj = scoreAdj + workBoard[newPositionBoard1].extraScore;
         if (workBoard[newPositionBoard1].extraScore < 0) {
-          if (workWhoseTurn === 1 && prevGameState.numberOfPlayers === 2) {
+          if (prevGameState.whoseTurn === 2 && prevGameState.numberOfPlayers === 2) {
             workWhoseTurn = 2;
             workMessage = 'Roll (extra roll)';
+            workOptMessage = 'Player 2';
           } else {
             workWhoseTurn = 1;
             workMessage = 'Roll (extra roll)';
+            workOptMessage = 'Player 1';
           }
         } else {
-          if (workWhoseTurn === 1 && prevGameState.numberOfPlayers === 2) {
+          if (prevGameState.whoseTurn === 1 && prevGameState.numberOfPlayers === 2) {
             workWhoseTurn = 2;
             workMessage = 'Roll (lose a roll)';
+            workOptMessage = 'Player 2';
           } else {
             workWhoseTurn = 1;
             workMessage = 'Roll (lose a roll)';
+            workOptMessage = 'Player 1';
           }
         }
       }
@@ -366,7 +371,7 @@ export default function App() {
         }
         // Adjust for situation where the other player is already past detour
         if (
-          (prevGameState.numberOfPlayers = 2 && prevGameState.position2 > newPosition1 && notAlreadyDeleted)
+          (prevGameState.numberOfPlayers = 2 && prevGameState.position2 > newPosition1 && notAlreadyDeleted === false)
         ) {
           newPosition2 = newPosition2 + 6;
         }
@@ -411,7 +416,7 @@ export default function App() {
         }
         // Adjust for situation where the other player is already past detour
         if (
-          (prevGameState.numberOfPlayers = 2 && prevGameState.position1 > newPosition2 && notAlreadyDeleted)
+          (prevGameState.numberOfPlayers = 2 && prevGameState.position1 > newPosition2 && notAlreadyDeleted === false)
         ) {
           newPosition1 = newPosition1 + 6;
         }
@@ -572,6 +577,7 @@ const styles = StyleSheet.create({
   itemText: {
     color: '#fff',
     fontSize: 8,
+    fontWeight: 'bold',
   },
   message: {
     flex: 1,
