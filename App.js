@@ -12,6 +12,7 @@ import {
 import { newBoard } from './newboard.js';
 
 const numColumns = 7;
+const newTurnTotals = [0, 0];
 
 export default function App() {
   const [
@@ -29,6 +30,7 @@ export default function App() {
       about,
       numberOfPlayers,
       whoseTurn,
+      turnTotals,
     },
     setGameState,
   ] = useState({
@@ -45,6 +47,7 @@ export default function App() {
     about: true,
     numberOfPlayers: 0,
     whoseTurn: 0,
+    turnTotals: JSON.parse(JSON.stringify(newTurnTotals)),
   });
 
   // render board
@@ -91,15 +94,18 @@ export default function App() {
   // press Reset button
   const pressReset = useCallback(() => {
     setGameState(prevGameState => {
+      console.log('*** RESET ***');
       let workNumberOfPlayers = prevGameState.numberOfPlayers;
       let workMessage = 'Roll again';
       let workOptMessage = 'Player 1';
       let workAbout = prevGameState.about;
+      let workTurnTotals = [1,0];
       let workWhoseTurn = 1;
       if (workNumberOfPlayers === 1 && prevGameState.position1 === 0) {
         workNumberOfPlayers = 0;
         workMessage = '1-player Game';
         workOptMessage = '2-player Game';
+        workTurnTotals = [0,0];
         workWhoseTurn = 0;
         workAbout = true;
       }
@@ -107,6 +113,7 @@ export default function App() {
         workNumberOfPlayers = 0;
         workMessage = '1-player Game';
         workOptMessage = '2-player Game';
+        workTurnTotals = [0,0];
         workWhoseTurn = 0;
         workAbout = true;
       }
@@ -124,6 +131,7 @@ export default function App() {
         about: workAbout,
         numberOfPlayers: workNumberOfPlayers,
         whoseTurn: workWhoseTurn,
+        turnTotals: JSON.parse(JSON.stringify(workTurnTotals)),
       };
     });
   }, []);
@@ -148,6 +156,7 @@ export default function App() {
         about: false,
         numberOfPlayers: workNumberOfPlayers,
         whoseTurn: 1,
+        turnTotals: [1,0],
       };
     });
   }, []);
@@ -172,6 +181,7 @@ export default function App() {
         about: false,
         numberOfPlayers: workNumberOfPlayers,
         whoseTurn: 1,
+        turnTotals: [1,0],
       };
     });
   }, []);
@@ -209,6 +219,7 @@ export default function App() {
         about: prevGameState.about,
         numberOfPlayers: prevGameState.numberOfPlayers,
         whoseTurn: prevGameState.whoseTurn,
+        turnTotals: prevGameState.turnTotals,
       };
     });
   }, []);
@@ -246,18 +257,37 @@ export default function App() {
         about: prevGameState.about,
         numberOfPlayers: prevGameState.numberOfPlayers,
         whoseTurn: prevGameState.whoseTurn,
+        turnTotals: prevGameState.turnTotals,
       };
     });
   }, []);
 
+  // calculate whose turn it is
+  const calculateTurn = (workTurnTotals,P1,P2) => {
+      let workWhoseTurn = 0; 
+      console.log('before calcTurn: workTurnTotals',workTurnTotals[0],workTurnTotals[1]); 
+      workTurnTotals[0] = workTurnTotals[0] + P1;
+      workTurnTotals[1] = workTurnTotals[1] + P2;
+      console.log('after calcTurn: workTurnTotals',workTurnTotals[0],workTurnTotals[1]);
+      if (workTurnTotals[0] > workTurnTotals[1]) {
+        workWhoseTurn = 1;
+      } else {
+        workWhoseTurn = 2;
+      };
+      console.log('after calcTurn: workWhoseTurn',workWhoseTurn);
+      return workWhoseTurn;
+    };
+
   // press Roll button
   const pressRoll = useCallback(() => {
     setGameState(prevGameState => {
+      console.log('* roll *');
       let workBoard = prevGameState.board.slice();
       let randomNumber = Math.floor(Math.random() * 6) + 1;
       let scoreAdj = 1;
       let workMessage = ' ';
       let workOptMessage = ' ';
+      let workTurnTotals = prevGameState.turnTotals;
       let workWhoseTurn = prevGameState.whoseTurn;
       // Testing line
       if (workWhoseTurn === 1) {
@@ -266,12 +296,23 @@ export default function App() {
         randomNumber = 2;
       }
       if (workWhoseTurn === 1 && prevGameState.numberOfPlayers === 2) {
-        workWhoseTurn = 2;
-        workOptMessage = 'Roll Player 2';
+        // workWhoseTurn = 2;
+        workWhoseTurn = calculateTurn(workTurnTotals,-1,1)
+        if (workWhoseTurn === 1){
+          workOptMessage = 'Roll Player 1';
+        } else {
+          workOptMessage = 'Roll Player 2';
+        }
       } else {
-        workWhoseTurn = 1;
-        workOptMessage = 'Roll Player 1';
+        // workWhoseTurn = 1;
+        workWhoseTurn = calculateTurn(workTurnTotals,1,-1)
+        if (workWhoseTurn === 1){
+          workOptMessage = 'Roll Player 1';
+        } else {
+          workOptMessage = 'Roll Player 2';
+        }
       }
+      console.log('set for next time: workWhoseTurn',workWhoseTurn);
       // Results of Even/Odd Pressed
       if (randomNumber % 2 === 1 && prevGameState.odd === true) {
         randomNumber = randomNumber * 2;
@@ -308,13 +349,16 @@ export default function App() {
           newPositionBoard2 = filteredBoard[i].key - 1;
         }
       }
+      console.log('newPositionBoard1',newPositionBoard1,'newPositionBoard2',newPositionBoard2);
+      console.log('randomNumber',randomNumber);
       // Need to adjust score if 'miss a turn' or 'gain a turn' was landed on
       // Player 1
       if (prevGameState.whoseTurn === 1 && workBoard[newPositionBoard1].extraScore !== undefined) {
         scoreAdj = scoreAdj + workBoard[newPositionBoard1].extraScore;
         if (workBoard[newPositionBoard1].extraScore < 0) {
           if (prevGameState.whoseTurn === 1 && prevGameState.numberOfPlayers === 2) {
-            workWhoseTurn = 1;
+            workWhoseTurn = calculateTurn(workTurnTotals,1,-1);
+            console.log('1',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (extra roll)';
             } else {
@@ -322,7 +366,8 @@ export default function App() {
             }
             workOptMessage = 'Roll Player 1';
           } else if (prevGameState.whoseTurn === 2 && prevGameState.numberOfPlayers === 2) {
-            workWhoseTurn = 2;
+            workWhoseTurn = calculateTurn(workTurnTotals,-1,1);
+            console.log('2',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (extra roll)';
             } else {
@@ -330,7 +375,8 @@ export default function App() {
             }
             workOptMessage = 'Roll Player 2';
           } else {
-            workWhoseTurn = 1;
+            workWhoseTurn = calculateTurn(workTurnTotals,1,-1);
+            console.log('3',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (extra roll)';
             } else {
@@ -340,7 +386,8 @@ export default function App() {
           }
         } else {
           if (prevGameState.whoseTurn === 1 && prevGameState.numberOfPlayers === 2) {
-            workWhoseTurn = 2;
+            workWhoseTurn = calculateTurn(workTurnTotals,-1,1);
+            console.log('4',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (lose a roll)';
             } else {
@@ -348,7 +395,8 @@ export default function App() {
             }
             workOptMessage = 'Roll Player 2';
           } else if (prevGameState.whoseTurn === 2 && prevGameState.numberOfPlayers === 2) {
-            workWhoseTurn = 1;
+            workWhoseTurn = calculateTurn(workTurnTotals,1,-1);
+            console.log('5',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (lose a roll)';
             } else {
@@ -356,7 +404,8 @@ export default function App() {
             }
             workOptMessage = 'Roll Player 1';
           } else {
-            workWhoseTurn = 1;
+            workWhoseTurn = calculateTurn(workTurnTotals,1,-1);
+            console.log('6',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (lose a roll)';
             } else {
@@ -371,7 +420,8 @@ export default function App() {
         scoreAdj = scoreAdj + workBoard[newPositionBoard2].extraScore;
         if (workBoard[newPositionBoard2].extraScore < 0) {
           if (prevGameState.whoseTurn === 1 && prevGameState.numberOfPlayers === 2) {
-            workWhoseTurn = 1;
+            workWhoseTurn = calculateTurn(workTurnTotals,1,-1);
+            console.log('7',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (extra roll)';
             } else {
@@ -379,7 +429,8 @@ export default function App() {
             }
             workOptMessage = 'Roll Player 1';
           } else if (prevGameState.whoseTurn === 2 && prevGameState.numberOfPlayers === 2) {
-            workWhoseTurn = 2;
+            workWhoseTurn = calculateTurn(workTurnTotals,-1,1);
+            console.log('8',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (extra roll)';
             } else {
@@ -387,7 +438,8 @@ export default function App() {
             }
             workOptMessage = 'Roll Player 2';
           } else {
-            workWhoseTurn = 1;
+            workWhoseTurn = calculateTurn(workTurnTotals,1,-1);
+            console.log('9',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (extra roll)';
             } else {
@@ -397,7 +449,8 @@ export default function App() {
           }
         } else {
           if (prevGameState.whoseTurn === 1 && prevGameState.numberOfPlayers === 2) {
-            workWhoseTurn = 2;
+            workWhoseTurn = calculateTurn(workTurnTotals,-1,1);
+            console.log('10',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (lose a roll)';
             } else {
@@ -405,7 +458,8 @@ export default function App() {
             }
             workOptMessage = 'Roll Player 2';
           } else if (prevGameState.whoseTurn === 2 && prevGameState.numberOfPlayers === 2) {
-            workWhoseTurn = 1;
+            workWhoseTurn = calculateTurn(workTurnTotals,1,-1);
+            console.log('11',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (lose a roll)';
             } else {
@@ -413,7 +467,8 @@ export default function App() {
             }
             workOptMessage = 'Roll Player 1';
           } else {
-            workWhoseTurn = 1;
+            workWhoseTurn = calculateTurn(workTurnTotals,1,-1);
+            console.log('12',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (lose a roll)';
             } else {
@@ -537,6 +592,7 @@ export default function App() {
         workOptMessage = 'Player 2 wins';
         workEndOfGame = true;
       }
+      console.log('** End roll **',workWhoseTurn,workTurnTotals[0],workTurnTotals[1]);
       return {
         roll: randomNumber,
         even: false,
@@ -551,6 +607,7 @@ export default function App() {
         about: false,
         numberOfPlayers: prevGameState.numberOfPlayers,
         whoseTurn: workWhoseTurn,
+        turnTotals: workTurnTotals,
       };
     });
   }, []);
