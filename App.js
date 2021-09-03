@@ -94,7 +94,6 @@ export default function App() {
   // press Reset button
   const pressReset = useCallback(() => {
     setGameState(prevGameState => {
-      console.log('*** RESET ***');
       let workNumberOfPlayers = prevGameState.numberOfPlayers;
       let workMessage = 'Roll again';
       let workOptMessage = 'Player 1';
@@ -265,23 +264,19 @@ export default function App() {
   // calculate whose turn it is
   const calculateTurn = (workTurnTotals,P1,P2) => {
       let workWhoseTurn = 0; 
-      console.log('before calcTurn: workTurnTotals',workTurnTotals[0],workTurnTotals[1]); 
       workTurnTotals[0] = workTurnTotals[0] + P1;
       workTurnTotals[1] = workTurnTotals[1] + P2;
-      console.log('after calcTurn: workTurnTotals',workTurnTotals[0],workTurnTotals[1]);
       if (workTurnTotals[0] > workTurnTotals[1]) {
         workWhoseTurn = 1;
       } else {
         workWhoseTurn = 2;
       };
-      console.log('after calcTurn: workWhoseTurn',workWhoseTurn);
       return workWhoseTurn;
     };
 
   // press Roll button
   const pressRoll = useCallback(() => {
     setGameState(prevGameState => {
-      console.log('* roll *');
       let workBoard = prevGameState.board.slice();
       let randomNumber = Math.floor(Math.random() * 6) + 1;
       let scoreAdj = 1;
@@ -289,12 +284,12 @@ export default function App() {
       let workOptMessage = ' ';
       let workTurnTotals = prevGameState.turnTotals;
       let workWhoseTurn = prevGameState.whoseTurn;
-      // Testing line
-      if (workWhoseTurn === 1) {
-        randomNumber = 1;
-      } else {
-        randomNumber = 2;
-      }
+      // Testing line - forec speciifc roll number
+      //if (workWhoseTurn === 1) {
+      //  randomNumber = 2;
+      //} else {
+      //  randomNumber = 4;
+      //}
       if (workWhoseTurn === 1 && prevGameState.numberOfPlayers === 2) {
         // workWhoseTurn = 2;
         workWhoseTurn = calculateTurn(workTurnTotals,-1,1)
@@ -312,7 +307,6 @@ export default function App() {
           workOptMessage = 'Roll Player 2';
         }
       }
-      console.log('set for next time: workWhoseTurn',workWhoseTurn);
       // Results of Even/Odd Pressed
       if (randomNumber % 2 === 1 && prevGameState.odd === true) {
         randomNumber = randomNumber * 2;
@@ -349,8 +343,6 @@ export default function App() {
           newPositionBoard2 = filteredBoard[i].key - 1;
         }
       }
-      console.log('newPositionBoard1',newPositionBoard1,'newPositionBoard2',newPositionBoard2);
-      console.log('randomNumber',randomNumber);
       // Need to adjust score if 'miss a turn' or 'gain a turn' was landed on
       // Player 1
       if (prevGameState.whoseTurn === 1 && workBoard[newPositionBoard1].extraScore !== undefined) {
@@ -358,7 +350,6 @@ export default function App() {
         if (workBoard[newPositionBoard1].extraScore < 0) {
           if (prevGameState.whoseTurn === 1 && prevGameState.numberOfPlayers === 2) {
             workWhoseTurn = calculateTurn(workTurnTotals,1,-1);
-            console.log('1',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (extra roll)';
             } else {
@@ -367,7 +358,6 @@ export default function App() {
             workOptMessage = 'Roll Player 1';
           } else if (prevGameState.whoseTurn === 2 && prevGameState.numberOfPlayers === 2) {
             workWhoseTurn = calculateTurn(workTurnTotals,-1,1);
-            console.log('2',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (extra roll)';
             } else {
@@ -376,7 +366,6 @@ export default function App() {
             workOptMessage = 'Roll Player 2';
           } else {
             workWhoseTurn = calculateTurn(workTurnTotals,1,-1);
-            console.log('3',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (extra roll)';
             } else {
@@ -387,7 +376,6 @@ export default function App() {
         } else {
           if (prevGameState.whoseTurn === 1 && prevGameState.numberOfPlayers === 2) {
             workWhoseTurn = calculateTurn(workTurnTotals,-1,1);
-            console.log('4',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (lose a roll)';
             } else {
@@ -396,7 +384,6 @@ export default function App() {
             workOptMessage = 'Roll Player 2';
           } else if (prevGameState.whoseTurn === 2 && prevGameState.numberOfPlayers === 2) {
             workWhoseTurn = calculateTurn(workTurnTotals,1,-1);
-            console.log('5',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (lose a roll)';
             } else {
@@ -405,7 +392,6 @@ export default function App() {
             workOptMessage = 'Roll Player 1';
           } else {
             workWhoseTurn = calculateTurn(workTurnTotals,1,-1);
-            console.log('6',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (lose a roll)';
             } else {
@@ -421,7 +407,6 @@ export default function App() {
         if (workBoard[newPositionBoard2].extraScore < 0) {
           if (prevGameState.whoseTurn === 1 && prevGameState.numberOfPlayers === 2) {
             workWhoseTurn = calculateTurn(workTurnTotals,1,-1);
-            console.log('7',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (extra roll)';
             } else {
@@ -430,7 +415,6 @@ export default function App() {
             workOptMessage = 'Roll Player 1';
           } else if (prevGameState.whoseTurn === 2 && prevGameState.numberOfPlayers === 2) {
             workWhoseTurn = calculateTurn(workTurnTotals,-1,1);
-            console.log('8',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (extra roll)';
             } else {
@@ -439,7 +423,6 @@ export default function App() {
             workOptMessage = 'Roll Player 2';
           } else {
             workWhoseTurn = calculateTurn(workTurnTotals,1,-1);
-            console.log('9',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (extra roll)';
             } else {
@@ -450,7 +433,6 @@ export default function App() {
         } else {
           if (prevGameState.whoseTurn === 1 && prevGameState.numberOfPlayers === 2) {
             workWhoseTurn = calculateTurn(workTurnTotals,-1,1);
-            console.log('10',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (lose a roll)';
             } else {
@@ -459,7 +441,6 @@ export default function App() {
             workOptMessage = 'Roll Player 2';
           } else if (prevGameState.whoseTurn === 2 && prevGameState.numberOfPlayers === 2) {
             workWhoseTurn = calculateTurn(workTurnTotals,1,-1);
-            console.log('11',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (lose a roll)';
             } else {
@@ -468,7 +449,6 @@ export default function App() {
             workOptMessage = 'Roll Player 1';
           } else {
             workWhoseTurn = calculateTurn(workTurnTotals,1,-1);
-            console.log('12',workTurnTotals[0],workTurnTotals[1],workWhoseTurn);
             if (workMessage === 'Great...roll doubled') {
               workMessage = 'Roll Doubled (lose a roll)';
             } else {
@@ -482,10 +462,10 @@ export default function App() {
       // Player 1 landed on detour spot
       if (workBoard[newPositionBoard1].itemsToAdd !== undefined && prevGameState.whoseTurn === 1) {
         let workBoard2 = workBoard.slice();
-        let notAlreadyDeleted = false;
+        let detourPriorlyOpened = false;
         let i;
         for (i = 0; i < workBoard2.length; i++) {
-          // Set detour to be visible
+          // Set detour squares to be visible
           if (workBoard2[i].addItem !== undefined) {
             if (
               workBoard2[newPositionBoard1].itemsToAdd === workBoard2[i].addItem &&
@@ -499,7 +479,7 @@ export default function App() {
           if (workBoard2[i].deleteItem !== undefined) {
             if (workBoard2[newPositionBoard1].itemsToAdd === workBoard2[i].deleteItem) {
               if (workBoard2[i].invisible === true) {
-                notAlreadyDeleted = true;
+                detourPriorlyOpened = true;
               } else {
                 workMessage = '(longer journey)';
               }
@@ -507,14 +487,34 @@ export default function App() {
             }
           }
         }
-        // Increment all board squares beyond this detour by 6
+        // Increment all board squares beyond and possibly in this detour by 6
         for (i = 0; i < workBoard2.length; i++) {
+          if (workBoard2[i].boardNumber !== undefined) {
+            // Mark detour squares
+            //  - boardnumber > newPosition
+            //  - square must be visible
+            //  - current detour not opended before
+            //  - current detour NE detour being processed
+            if (
+              workBoard2[i].boardNumber > newPosition1 &&
+              workBoard2[i].invisible !== true &&
+              workBoard2[i].addItem !== undefined &&
+              workBoard2[newPositionBoard1].itemsToAdd !== workBoard2[i].addItem &&
+              detourPriorlyOpened === false
+            ) {
+              workBoard2[i].boardNumber = workBoard2[i].boardNumber + 6;
+            }
+          }
+          // Mark non-detour squares
+          //  - boardnumber > newPosition
+          //  - square must be visible
+          //  - detour not opended before
           if (workBoard2[i].boardNumber !== undefined) {
             if (
               workBoard2[i].boardNumber > newPosition1 &&
               workBoard2[i].invisible !== true &&
               workBoard2[i].addItem === undefined &&
-              notAlreadyDeleted === false
+              detourPriorlyOpened === false
             ) {
               workBoard2[i].boardNumber = workBoard2[i].boardNumber + 6;
             }
@@ -524,7 +524,7 @@ export default function App() {
         if (
           prevGameState.numberOfPlayers === 2 &&
           prevGameState.position2 > newPosition1 &&
-          notAlreadyDeleted === false
+          detourPriorlyOpened === false
         ) {
           newPosition2 = newPosition2 + 6;
         }
@@ -532,10 +532,10 @@ export default function App() {
         // Player 2 landed on detour spot
       } else if (workBoard[newPositionBoard2].itemsToAdd !== undefined && prevGameState.whoseTurn === 2) {
         let workBoard2 = workBoard.slice();
-        let notAlreadyDeleted = false;
+        let detourPriorlyOpened = false;
         let i;
         for (i = 0; i < workBoard2.length; i++) {
-          // Set detour to be visible
+          // Set detour squares to be visible
           if (workBoard2[i].addItem !== undefined) {
             if (
               workBoard2[newPositionBoard2].itemsToAdd === workBoard2[i].addItem &&
@@ -549,7 +549,7 @@ export default function App() {
           if (workBoard2[i].deleteItem !== undefined) {
             if (workBoard2[newPositionBoard2].itemsToAdd === workBoard2[i].deleteItem) {
               if (workBoard2[i].invisible === true) {
-                notAlreadyDeleted = true;
+                detourPriorlyOpened = true;
               } else {
                 workMessage = '(longer journey)';
               }
@@ -560,11 +560,31 @@ export default function App() {
         // Increment all board squares beyond this detour by 6
         for (i = 0; i < workBoard2.length; i++) {
           if (workBoard2[i].boardNumber !== undefined) {
+            // Mark detour squares
+             //  - boardnumber > newPosition
+            //  - square must be visible
+            //  - current detour not opended before
+            //  - current detour NE detour being processed
+            if (
+              workBoard2[i].boardNumber > newPosition2 &&
+              workBoard2[i].invisible !== true &&
+              workBoard2[i].addItem !== undefined &&
+              workBoard2[newPositionBoard2].itemsToAdd !== workBoard2[i].addItem &&
+              detourPriorlyOpened === false
+            ) {
+              workBoard2[i].boardNumber = workBoard2[i].boardNumber + 6;
+            }
+          }
+          // Mark non-detour squares
+          //  - boardnumber > newPosition
+          //  - square must be visible
+          //  - detour not opended before
+          if (workBoard2[i].boardNumber !== undefined) {
             if (
               workBoard2[i].boardNumber > newPosition2 &&
               workBoard2[i].invisible !== true &&
               workBoard2[i].addItem === undefined &&
-              notAlreadyDeleted === false
+              detourPriorlyOpened === false
             ) {
               workBoard2[i].boardNumber = workBoard2[i].boardNumber + 6;
             }
@@ -574,7 +594,7 @@ export default function App() {
         if (
           prevGameState.numberOfPlayers === 2 &&
           prevGameState.position1 > newPosition2 &&
-          notAlreadyDeleted === false
+          detourPriorlyOpened === false
         ) {
           newPosition1 = newPosition1 + 6;
         }
@@ -592,7 +612,6 @@ export default function App() {
         workOptMessage = 'Player 2 wins';
         workEndOfGame = true;
       }
-      console.log('** End roll **',workWhoseTurn,workTurnTotals[0],workTurnTotals[1]);
       return {
         roll: randomNumber,
         even: false,
