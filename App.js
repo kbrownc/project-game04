@@ -138,22 +138,12 @@ export default function App() {
   // pressed 1-Player button
   const pressPlayers1 = useCallback(() => {
     setGameState(prevGameState => {
-      let workNumberOfPlayers = 1;
-      let workMessage = 'Roll again';
-      let workOptMessage = 'Player 1';
       return {
-        roll: prevGameState.roll,
-        even: prevGameState.even,
-        odd: prevGameState.odd,
-        position1: prevGameState.position1,
-        position2: prevGameState.position2,
-        message: workMessage,
-        optMessage: workOptMessage,
-        score: prevGameState.score,
-        board: prevGameState.board,
-        endOfGame: prevGameState.endOfGame,
+        ...prevGameState,
+        message: 'Roll again',
+        optMessage: 'Player 1',
         about: false,
-        numberOfPlayers: workNumberOfPlayers,
+        numberOfPlayers: 1 ,
         whoseTurn: 1,
         turnTotals: [1,0],
       };
@@ -163,22 +153,12 @@ export default function App() {
   // pressed 2-Player button
   const pressPlayers2 = useCallback(() => {
     setGameState(prevGameState => {
-      let workNumberOfPlayers = 2;
-      let workMessage = ' ';
-      let workOptMessage = 'Roll Player 1';
       return {
-        roll: prevGameState.roll,
-        even: prevGameState.even,
-        odd: prevGameState.odd,
-        position1: prevGameState.position1,
-        position2: prevGameState.position2,
-        message: workMessage,
-        optMessage: workOptMessage,
-        score: prevGameState.score,
-        board: prevGameState.board,
-        endOfGame: prevGameState.endOfGame,
+        ...prevGameState,
+        message: ' ',
+        optMessage: 'Roll Player 1',
         about: false,
-        numberOfPlayers: workNumberOfPlayers,
+        numberOfPlayers: 2,
         whoseTurn: 1,
         turnTotals: [1,0],
       };
@@ -205,20 +185,9 @@ export default function App() {
         workMessage = 'Roll again (EVEN only)';
       }
       return {
-        roll: prevGameState.roll,
+        ...prevGameState,
         even: workEven,
-        odd: prevGameState.odd,
-        position1: prevGameState.position1,
-        position2: prevGameState.position2,
         message: workMessage,
-        optMessage: prevGameState.optMessage,
-        score: prevGameState.score,
-        board: prevGameState.board,
-        endOfGame: prevGameState.endOfGame,
-        about: prevGameState.about,
-        numberOfPlayers: prevGameState.numberOfPlayers,
-        whoseTurn: prevGameState.whoseTurn,
-        turnTotals: prevGameState.turnTotals,
       };
     });
   }, []);
@@ -243,25 +212,28 @@ export default function App() {
         workMessage = 'Roll again (EVEN only)';
       }
       return {
-        roll: prevGameState.roll,
-        even: prevGameState.even,
+        ...prevGameState,
         odd: workOdd,
-        position1: prevGameState.position1,
-        position2: prevGameState.position2,
         message: workMessage,
-        optMessage: prevGameState.optMessage,
-        score: prevGameState.score,
-        board: prevGameState.board,
-        endOfGame: prevGameState.endOfGame,
-        about: prevGameState.about,
-        numberOfPlayers: prevGameState.numberOfPlayers,
-        whoseTurn: prevGameState.whoseTurn,
-        turnTotals: prevGameState.turnTotals,
       };
     });
   }, []);
 
-  // calculate whose turn it is
+  // Function 'calculateTurn' :calculate whose turn it is next, Player 1 or Player 2
+  // - Parms: 
+  //   workTurnTotals - (an array holding 2 integers which represent the cumulative actions of each player)
+  //   P1 - an integer which is the Player 1 adjustment to the 1st entry in the workTurnTotals array
+  //   P2 - an integer which is the Player 2 adjustment to the 2nd entry in the workTurnTotals array
+  //     (P1/P2 represents using a turn, gaining a turn, losing a turn on the current roll)
+  //   'Examples' of P1/P2 valid values:
+  //    Player 1 rolls: -1/+1
+  //    Player 2 rolls: +1/-1
+  //    Player 1 gain a roll: +1/-1
+  //    Player 2 lose a roll" +1/-1       
+  //  - Returned value:
+  //    workWhoseTurn - whose turn is it next (1 for Player 1, 2 for player 2). Derived by
+  //                    determining which entry in the workTurnTotals is larger.
+  //
   const calculateTurn = (workTurnTotals,P1,P2) => {
       let workWhoseTurn = 0; 
       workTurnTotals[0] = workTurnTotals[0] + P1;
@@ -327,7 +299,7 @@ export default function App() {
       });
       let newPosition1 = prevGameState.position1;
       let newPosition2 = prevGameState.position2;
-      if (prevGameState.whoseTurn === 1 || prevGameState.numberOfPlayers === 1) {
+      if (prevGameState.whoseTurn === 1) {
         newPosition1 = Math.min(prevGameState.position1 + randomNumber, filteredBoard.length);
       } else {
         newPosition2 = Math.min(prevGameState.position2 + randomNumber, filteredBoard.length);
@@ -636,7 +608,7 @@ export default function App() {
     <View style={styles.container}>
       <View style={styles.nav}>
         <Button
-          onPress={() => pressReset()}
+          onPress={pressReset}
           title="Reset"
           color="blue"
           disabled={numberOfPlayers === 0 ? true : false}
@@ -650,7 +622,7 @@ export default function App() {
               : [styles.item, styles.itemBlue]
           }
         >
-          <TouchableHighlight onPress={() => pressEven()}>
+          <TouchableHighlight onPress={pressEven}>
             <Text style={styles.itemText}>Even</Text>
           </TouchableHighlight>
         </View>
@@ -663,13 +635,13 @@ export default function App() {
               : [styles.item, styles.itemBlue]
           }
         >
-          <TouchableHighlight onPress={() => pressOdd()}>
+          <TouchableHighlight onPress={pressOdd}>
             <Text style={styles.itemText}>Odd</Text>
           </TouchableHighlight>
         </View>
         <View style={endOfGame || numberOfPlayers === 0 ? styles.itemInvisible : null}>
           <Button
-            onPress={() => pressRoll()}
+            onPress={pressRoll}
             title="Roll"
             color="blue"
             disabled={endOfGame || numberOfPlayers === 0 ? true : false}
@@ -689,7 +661,7 @@ export default function App() {
         <View style={styles.messageRow}>
           <Text style={styles.message}>{message}</Text>
           <View style={numberOfPlayers !== 0 ? styles.itemInvisible : styles.messageRow}>
-            <TouchableHighlight onPress={() => pressPlayers1()}>
+            <TouchableHighlight onPress={pressPlayers1}>
               <Text style={styles.messageRow2}>Select</Text>
             </TouchableHighlight>
           </View>
@@ -697,7 +669,7 @@ export default function App() {
         <View style={styles.messageRow}>
           <Text style={styles.message}>{optMessage}</Text>
           <View style={numberOfPlayers !== 0 ? styles.itemInvisible : styles.messageRow}>
-            <TouchableHighlight onPress={() => pressPlayers2()}>
+            <TouchableHighlight onPress={pressPlayers2}>
               <Text style={styles.messageRow2}>Select</Text>
             </TouchableHighlight>
           </View>
