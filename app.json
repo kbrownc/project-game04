@@ -2,7 +2,7 @@
   "expo": {
     "name": "Ugame",
     "slug": "U-game",
-    "description": "This game has 1 or 2 players move along a U shaped board. It is designed for a younger audience.",
+    "description": "This game has 1 or 2 players move along a U shaped board. (For a younger audience)",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
